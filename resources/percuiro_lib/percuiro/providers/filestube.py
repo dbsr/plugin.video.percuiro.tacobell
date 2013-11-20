@@ -19,7 +19,7 @@ filestube = get_provider_skeleton({
         'items': {
             'mapping': lambda soup: soup.findAll('div', {'id': 'newresult'}),
             'parser': lambda soup: {
-                'label': '[{}] {}'.format(
+                'label': '[{0}] {1}'.format(
                     soup.findNext('b', {'style': re.compile(r'.*943100.*')}).text,
                     soup.findNext('a').text),
                 'url': soup.findNext('a').get('href'),
