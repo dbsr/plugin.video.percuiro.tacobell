@@ -65,9 +65,12 @@ def list_results(results):
                 path = plugin.url_for('provider_resolve', url=result['url'], provider=provider)
             items.append(dict(
                 label=result['label'],
-                path=path
+                path=path,
+                is_playable=True
             ))
     return items
+
+uu
 
 
 @plugin.route('/resolve/<provider>/<url>', name='provider_resolve')
