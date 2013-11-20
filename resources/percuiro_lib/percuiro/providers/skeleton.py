@@ -26,7 +26,7 @@ _provider = {
         'url': '',
         'query_parameter': 'q',
         'default_params': {},
-        'supported': (QUERIES_ALL,),
+        'supported': (QUERIES_ALL, QUERIES_TV),
         'query_mods': {
             'tv_show': lambda query: query,
             'global': lambda query: query

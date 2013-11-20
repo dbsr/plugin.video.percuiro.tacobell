@@ -9,7 +9,7 @@ from percuiro._module import module
 plugin.register_module(module, '/_')
 
 import percuiro
-from percuiro import browser
+from percuiro import browser, QUERIES_TV, QUERIES_ALL
 
 class UrlResolver(object):
     def resolve(self, link):
@@ -52,7 +52,7 @@ def manual_search():
 
 @plugin.route('/search-tv-show/<query>')
 def search_tv_show(query):
-    results = percuiro.search_tv_show(query)
+    results = percuiro.search(QUERIES_TV, query)
     return list_results(results)
 
 

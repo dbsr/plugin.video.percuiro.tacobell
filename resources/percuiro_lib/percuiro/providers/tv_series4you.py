@@ -19,12 +19,11 @@ tv_series4you = get_provider_skeleton({
     },
     'soup': {
         'items': {
-            'resolved': True,
             'mapping': lambda soup: filter(is_debrid_host, soup.findAll('a')),
             'parser': lambda result: {
                 'label': os.path.basename(result.text),
                 'url': result['href'],
-                'resolve': False
+                'resolved': True
             },
             'parser_filter': lambda item, qstring: (
                 get_season_episode(qstring) == get_season_episode(item['label'])

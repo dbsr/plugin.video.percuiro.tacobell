@@ -20,6 +20,16 @@ def get_season_episode(query):
             return map(int, m.groups())
 
 
+def split_tv_show_query(query):
+    try:
+        s, e = get_season_episode(query)
+        show = get_season_episode_rgx().sub('', query).strip()
+    except:
+        pass
+    else:
+        return show, s, e
+
+
 def is_debrid_host(anchor):
     if isinstance(anchor, str):
         href = anchor

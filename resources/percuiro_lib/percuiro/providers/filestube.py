@@ -23,7 +23,7 @@ filestube = get_provider_skeleton({
                     soup.findNext('b', {'style': re.compile(r'.*943100.*')}).text,
                     soup.findNext('a').text),
                 'url': soup.findNext('a').get('href'),
-                'resolve': True
+                'resolved': False
             }
         },
         'resolve': {

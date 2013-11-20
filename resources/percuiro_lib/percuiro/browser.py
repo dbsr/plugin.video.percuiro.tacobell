@@ -3,9 +3,9 @@
 
 from xbmcswift2 import Module
 
-from .._exc import PercuiroException
-from ..apis import query_tvdb
-from .._module import module
+from _exc import PercuiroException
+from apis import query_tvdb
+from _module import module
 
 
 store = module.plugin.get_storage('browser', TTL=1440)
