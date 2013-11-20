@@ -2,7 +2,7 @@ import os, sys
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'resources/percuiro_lib'))
 
 from xbmcswift2 import Plugin, xbmcplugin, xbmcgui, actions
-#import urlresolver
+import urlresolver
 
 plugin = Plugin()
 from percuiro._module import module
@@ -11,11 +11,6 @@ plugin.register_module(module, '/_')
 import percuiro
 from percuiro import browser, QUERIES_TV, QUERIES_ALL
 
-class UrlResolver(object):
-    def resolve(self, link):
-        return link
-
-urlresolver = UrlResolver()
 
 
 @plugin.route('/')
@@ -60,7 +55,7 @@ def list_results(results):
     items = []
     for provider, results in results.items():
         items.append(dict(
-            label='[{}]'.format(provider),
+            label='[{0}]'.format(provider),
             path=''
         ))
         for result in results:
