@@ -27,7 +27,7 @@ class Provider(object):
 
     def search_tv_show(self, show, season, episode):
         query = self.provider['query']
-        qstring = '{} s{:0>2}e{:0>2}'.format(show, season, episode)
+        qstring = '{0} s{1:0>2}e{2:0>2}'.format(show, season, episode)
         qmod = query['query_mods'].get('tv_show', lambda _: _)
         soup = self._req_soup(self.query_url, {
             query['query_parameter']: qmod(qstring)
