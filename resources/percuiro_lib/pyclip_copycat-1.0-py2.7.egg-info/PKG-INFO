@@ -1,0 +1,10 @@
+Metadata-Version: 1.0
+Name: pyclip-copycat
+Version: 1.0
+Summary: easily interact with clipboard from Python fork from pyclip
+Home-page: https://github.com/georgefs/pyclip
+Author: george.li
+Author-email: goblin.george@gmail.com
+License: MIT
+Description: UNKNOWN
+Platform: UNKNOWN

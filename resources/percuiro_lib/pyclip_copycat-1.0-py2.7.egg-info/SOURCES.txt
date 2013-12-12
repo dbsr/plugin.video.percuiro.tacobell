@@ -1,0 +1,6 @@
+README
+clipboard.py
+pyclip_copycat.egg-info/PKG-INFO
+pyclip_copycat.egg-info/SOURCES.txt
+pyclip_copycat.egg-info/dependency_links.txt
+pyclip_copycat.egg-info/top_level.txt
