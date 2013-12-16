@@ -24,17 +24,24 @@ def search(provider):
     p = providers[provider]
     query = plugin.keyboard(heading='Enter search terms')
     results = p.search(query)
+    return list_results(results, provider)
+
+
+def list_results(results, provider):
     return map(
         lambda result: dict(
             label=result['label'],
-            path=plugin.url_for('resolve_provider_page', provider=provider, url=result['url'])),
+            path=plugin.url_for('resolve_provider_page', provider=provider, url=result['url'], label=result['label'])),
         results)
 
 
-@plugin.route('/resolve-provider-page/<provider>/<url>')
-def resolve_provider_page(provider, url):
+@plugin.route('/resolve-provider-page/<provider>/<url>/<label>')
+def resolve_provider_page(provider, url, label):
     p = providers[provider]
-    results = p.parse_result_page(url)
+    if label == 'Next >>':
+        results = p.parse_next_page(url)
+        return list_results(results, provider)
+    results = p.get_link_page(url)
     return map(
         lambda result: dict(
             label=result['label'],

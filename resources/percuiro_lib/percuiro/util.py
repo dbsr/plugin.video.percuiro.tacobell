@@ -37,15 +37,5 @@ def clipboard_paste():
     return ret
 
 
-def is_debrid_host(anchor):
-    if isinstance(anchor, str):
-        href = anchor
-    elif isinstance(anchor, dict):
-        href = anchor.get('url', '')
-    else:
-        try:
-            href = anchor.get('href')
-        except:
-            return
-    if href:
-        return re.search(REAL_DEBRID_REGEX, href)
+def is_debrid_host(href):
+    return re.search(REAL_DEBRID_REGEX, href) is not None
