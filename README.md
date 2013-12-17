@@ -9,10 +9,10 @@ Filestube, theextopia and downtr are the default search providers.
 
 ### Features
 - Search & Play 
-    This will search all providers in turn (sorted by customizable provider
-    priority) until it finds a playable result. Playable means the file exists
-    on the filehost in question and is resolvable to a link the user can 
-    download.
+  This will search all providers in turn (sorted by customizable provider
+  priority) until it finds a playable result. Playable means the file exists
+  on the filehost in question and is resolvable to a link the user can 
+  download.
 
 - Search all enabled providers
     Although it's possible to search a specific provider it's way more 
