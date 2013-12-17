@@ -1,14 +1,9 @@
 # -*- coding: utf-8 -*-
 # dydrmntion@gmail.com
 
-import requests
-from BeautifulSoup import BeautifulSoup
-
-import util
-
 
 providers = (
-   dict(
+    dict(
         name='filestube.com',
         base_url='http://www.filestube.com',
         query_url=('http://www.filestube.com/query.html?hosting=,23,99,15,24,13,'
@@ -17,7 +12,7 @@ providers = (
         result_selector=[('div', {'id': 'newresult'}), ('a',)],
         result_title=lambda result: result.text,
         result_link=lambda result: result.get('href'),
-        thumbnail_url='http://static.filestube.to/files/images/thumbnailN.gif'
+        thumbnail_url='http://www.userlogos.org/files/logos/teekay/filestube.png'
     ),
     dict(
         name='downtr.co',
@@ -26,7 +21,7 @@ providers = (
         result_selector=[('div', {'class': 'result'}), ('div', {'class': 'name'}), ('a',)],
         result_title=lambda result: result.text,
         result_link=lambda result: result.get('href'),
-        thumbnail_url='http://www.userthumbnails.org/files/thumbnails/DMaster/Downtr.png'
+        thumbnail_url='http://www.userlogos.org/files/imagecache/thumbnail/logos/Efreak15/12400474740-orig.png'
     ),
     dict(
         name='theextopia.com',

@@ -1,17 +1,19 @@
-import os, sys
+import os
+import sys
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'resources/percuiro_lib'))
 import json
 
-from xbmcswift2 import Plugin, xbmcplugin, xbmcgui, actions, xbmc, actions
+from xbmcswift2 import Plugin, xbmc
 import urlresolver
 
 from percuiro import util, get_plugin_providers, get_plugin_provider
 
 plugin = Plugin()
 
+
 @plugin.route('/')
 def index():
-    providers = get_plugin_providers()
+    providers = get_plugin_providers(plugin)
     items = [
         dict(
             label='search & play',
@@ -22,7 +24,7 @@ def index():
             path=plugin.url_for('global_search')
         ),
         dict(
-            label='provider settings',
+            label='providers settings',
             path=plugin.url_for('provider_settings'))]
     items.extend(map(
         lambda provider: dict(
@@ -35,7 +37,7 @@ def index():
 
 @plugin.route('/search/<provider>')
 def search(provider):
-    p = get_plugin_provider(provider)
+    p = get_plugin_provider(plugin, provider)
     query = get_keyboard_query()
     results = p.search(query)
     return list_results(results, provider)
@@ -46,23 +48,23 @@ def search_and_play():
     '''
     Queries available providers in order of priority and plays first
     available result
-    
+
     '''
     query = get_keyboard_query()
-    for provider in get_plugin_providers():
+    for provider in get_plugin_providers(plugin):
         plugin.notify(msg='Querying {}...'.format(provider.name))
         results = provider.search(query)
         for result in filter(
                 lambda result: util.query_in_label(query, result['label']),
                 results):
             plugin.notify(msg='{}: Resolving link: {}'.format(provider.name,
-                result['url']))
+                          result['url']))
             links = provider.get_link_page(result['url'])
             for link in links:
                 resolved = urlresolver.resolve(link['url'])
-                if resolved: 
+                if resolved:
                     xbmc.Player().play(resolved)
-                    return xbmcswift2.finish()
+                    return
                 plugin.notify(msg='Failed resolving: {}'.format(link['url']))
 
 
@@ -74,11 +76,11 @@ def global_search(next_pages=None):
         next_pages = json.loads(next_pages)
         for provider_name, url in next_pages:
             plugin.notify(msg='Requesting next page for {}..'.format(provider_name))
-            provider = providers[provider_name]
+            provider = get_plugin_provider(plugin, provider_name)
             provider_results.append((provider_name, provider.parse_next_page(url)))
     else:
         query = get_keyboard_query()
-        for provider in get_plugin_providers():
+        for provider in get_plugin_providers(plugin):
             plugin.notify(msg='Querying {}..'.format(provider.name))
             provider_results.append((provider.name, provider.search(query)))
     items = []
@@ -95,15 +97,14 @@ def global_search(next_pages=None):
     if next_pages:
         items.append(dict(
             label='Next >>',
-            path=plugin.url_for('global_search_next', 
+            path=plugin.url_for('global_search_next',
                                 next_pages=json.dumps(next_pages))))
     return items
 
-    
 
 @plugin.route('/resolve-provider-page/<provider>/<url>/<label>')
 def resolve_provider_page(provider, url, label):
-    p = get_plugin_provider(provider)
+    p = get_plugin_provider(plugin, provider)
     if label == 'Next >>':
         results = p.parse_next_page(url)
         return list_results(results, provider)
@@ -127,16 +128,15 @@ def resolve(url):
     plugin.set_resolved_url(resolved)
 
 
-
-
 @plugin.route('/provider-settings/<provider>/<setting>', name='provider_settings_set')
 @plugin.route('/provider-settings')
 def provider_settings(provider=None, setting=None):
     if provider:
-        p = get_plugin_provider(provider)
+        p = get_plugin_provider(plugin, provider)
         if setting == 'priority':
             # ask user for priority using keyboard
-            priority = plugin.keyboard(default=str(p.priority),
+            priority = plugin.keyboard(
+                default=str(p.priority),
                 heading='Please enter new priority for {}'.format(p.name))
             try:
                 p.priority = priority
@@ -145,24 +145,35 @@ def provider_settings(provider=None, setting=None):
         else:
             p.toggle_status()
     items = []
-    for provider in get_plugin_providers():
+    for provider in get_plugin_providers(plugin):
         items.extend([
             dict(
                 label=provider.name,
-                path=plugin.url_for('_nowhere')
+                path=plugin.url_for('_nowhere'),
+                thumbnail=provider.thumbnail
             ),
             dict(
                 label='    status    =   {}'.format(provider.status),
-                path=plugin.url_for('provider_settings_set', 
-                    provider=provider.name, setting='status')
+                path=plugin.url_for(
+                    'provider_settings_set',
+                    provider=provider.name, setting='status'),
+                thumbnail=provider.thumbnail
             ),
             dict(
                 label='    priority  =  {}'.format(provider.priority),
-                path=plugin.url_for('provider_settings_set', 
+                path=plugin.url_for(
+                    'provider_settings_set',
                     provider=provider.name,
-                    setting='priority'))
+                    setting='priority'),
+                thumbnail=provider.thumbnail
+            )
         ])
     return items
+
+
+@plugin.route('/_nowhere')
+def _nowhere():
+    pass
 
 
 def list_results(results, provider, indentation=0):
@@ -174,7 +185,7 @@ def list_results(results, provider, indentation=0):
 
 
 def get_keyboard_query():
-    last_search_storage  = plugin.get_storage('last_search')
+    last_search_storage = plugin.get_storage('last_search')
     last_search = last_search_storage.get('last_search', '')
     query = plugin.keyboard(default=last_search, heading='Enter search terms')
     if query:
