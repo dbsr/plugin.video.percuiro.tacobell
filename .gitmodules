@@ -1,0 +1,3 @@
+[submodule "resources/percuiro_lib/xbmcswift2"]
+	path = resources/percuiro_lib/xbmcswift2
+	url = https://github.com/dbsr/xbmcswift2

@@ -1,28 +1,15 @@
 # -*- coding: utf-8 -*-
 # dydrmntion@gmail.com
 
+
+import os
 import commands
 import re
 import subprocess
+from urlparse import urlparse
+import urllib
 
-
-REAL_DEBRID_REGEX = (
-      r'1fichier.com|1st-files.com|2shared.com|4shared.com|aetv.com' +
-      '|bayfiles.com|bitshare.com|canalplus.fr|cbs.com|cloudzer.net|crocko.com' +
-      '|cwtv.com|dailymotion.com|dengee.net|depfile.com|dizzcloud.com|dl.free.fr' +
-      '|extmatrix.com|filebox.com|filecloud.io|filefactory.com|fileflyer.com' +
-      '|fileover.net|filepost.com|filerio.com|filesabc.com|filesend.net|filesflash.co' +
-      '|filesmonster.com|freakshare.net|gigasize.com|hipfile.com|hotfile.co' +
-      '|hugefiles.net|hulkshare.com|hulu.com|jumbofiles.com|justin.tv|keep2share.c' +
-      '|letitbit.net|load.to|mediafire.com|mega.co.nz|megashares.com|mixturevideo.co' +
-      '|netload.in|nowdownload.eu|nowvideo.eu|purevid.com|putlocker.com|rapidgator.net' +
-      '|rapidshare.com|redtube.com|rutube.ru|scribd.com|sendspace.com|share-online.bi' +
-      '|sharefiles.co|shareflare.net|slingfile.com|sockshare.com|soundcloud.co' +
-      '|speedyshare.com|turbobit.net|ultramegabit.com|unibytes.co' +
-      '|uploaded.to|uploaded.net|ul.to|uploadhero.co|uploading.com|uptobox.co' +
-      '|userporn.com|veevr.com|vimeo.com|vip-file.com|wat.tv|youporn.com|youtube.com'
-)
-
+from common import REAL_DEBRID_REGEX, PROVIDERS_THUMBNAIL_PATH
 
 def clipboard_paste():
     ret = ''
@@ -39,3 +26,34 @@ def clipboard_paste():
 
 def is_debrid_host(href):
     return re.search(REAL_DEBRID_REGEX, href) is not None
+
+
+def label_from_link(link):
+    purl = urlparse(link)
+    return '{:<20} {}'.format(purl.netloc.upper(), os.path.basename(link))
+
+
+def query_in_label(query, label):
+    query_split = query.split()
+    matches = filter(
+        lambda split: re.search(split, label, re.I),
+        query_split)
+    return len(matches) == len(query_split)
+
+
+def get_provider_thumbnail(plugin_profile_path, url):
+    ext = url.split('.')[-1]
+    provider_thumbnails_path = os.path.join(plugin_profile_path, PROVIDERS_THUMBNAIL_PATH)
+    if not os.path.isdir(provider_thumbnails_path):
+        os.mkdir(provider_thumbnails_path)
+    destination = os.path.join(
+        provider_thumbnails_path, 
+        '{}.{}'.format(str(hash(url)), ext).strip('-'))
+    if not os.path.exists(destination):
+        try: 
+            urllib.urlretrieve(url, destination)
+        except IOError as e:
+            print 'Error retrieving provider thumbnail: {} -> {}.'.format(
+                url, destination)
+            return
+    return destination

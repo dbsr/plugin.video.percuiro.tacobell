@@ -3,6 +3,7 @@
 
 import os
 import re
+import urllib
 
 import requests
 from BeautifulSoup import BeautifulSoup
@@ -12,7 +13,7 @@ import util
 
 class Provider(object):
     def __init__(self, name, base_url, query_url, result_selector, 
-            result_title, result_link, link_selector='a'):
+            result_title, result_link, *args, **kwargs):
         '''The Provider class is used by all provider definition to search 
         and parse results.
 
@@ -27,8 +28,6 @@ class Provider(object):
                                    of a single result and returns the title (str).
             result_link (lambda): expects a BeautifulSoup.BeautifulSoup object
                                   of a single result and returs the url (str).
-            link_selector (list): the selector chain used to resolve a playable
-                                  video url.
         '''
         self.name = name
         self.base_url = base_url
@@ -36,10 +35,22 @@ class Provider(object):
         self.result_selector = result_selector
         self.result_title = result_title
         self.result_link = result_link
-        self.link_selector = link_selector
 
     def __repr__(self):
-        return '<percuiro.Provider ' + self.name + '>'
+        return '<percuiro.Provider:' + self.name + '>'
+
+    @property
+    def provider_logo(self):
+        ext = self.logo_url.split('.')[-1]
+        destination = os.path.join(self.logos_path, 
+            '{}.{}'.format(hash(self.logo_url), ext).strip('-'))
+        if not os.path.exists(destination):
+            try:
+                urllib.urlretrieve(self.logo_url, destination)
+            except (OSError, IOError) as e:
+                print e
+                destination = None
+        return destination
 
     def _req_soup(self, url):
         '''Returns souped result of http request.
@@ -94,7 +105,10 @@ class Provider(object):
             a list of result dictionaries.
 
         '''
-        url = self.query_url.format(query=query.replace(' ', '+'))
+        try:
+            url = self.query_url.format(query=query.replace(' ', '+'))
+        except AttributeError:
+            return []
         soup = self._req_soup(url)
         return self._parse_search_results(soup)
 
@@ -141,7 +155,7 @@ class Provider(object):
     def _parse_link_page(self, soup):
         return  map(
             lambda link: dict(
-                label=link,
+                label=util.label_from_link(link),
                 url=link),
             filter(
                 lambda url: util.is_debrid_host(url) and not re.search(
@@ -151,3 +165,64 @@ class Provider(object):
     def parse_next_page(self, url):
         soup = self._req_soup(url)
         return self._parse_search_results(soup)
+
+
+class PluginProvider(Provider):
+    def __init__(self, plugin, thumbnail_url, *args, **kwargs):
+        '''
+        Subclassed to keep xbmc dependencies separated from main 
+        class for easier testing. The Pluginprovider class provides
+        xbmc settings get and setters for the provider.
+
+        Args:
+            plugin: xbmcswift2.Plugin instance
+        '''
+        self.plugin = plugin
+        self.thumbnail_url = thumbnail_url
+        Provider.__init__(self, *args, **kwargs)
+        if not self.priority:
+            self.priority = 100
+        if self.status == None:
+            self.status = 'enabled'
+    
+    @property
+    def thumbnail(self):
+        return util.get_provider_thumbnail(self.plugin.storage_path,
+            self.thumbnail_url)
+
+    def _provider_settings(self, key, value=None):
+        settings = self.plugin.get_storage('provider_settings')
+        if not settings.get(self.name):
+            settings[self.name] = {}
+        if value:
+            settings[self.name][key] = value
+        else:
+            return settings[self.name].get(key)
+
+    @property
+    def priority(self):
+        return self._provider_settings('priority')
+
+    @priority.setter
+    def priority(self, value):
+        try:
+            priority = int(value)
+        except ValueError:
+            raise ValueError('{!r} is not a valid priority value'.format(priority))
+        if priority < 0 or priority > 100:
+            raise ValueError('Priority value must be between 0 and 100')
+        self._provider_settings('priority', priority)
+
+    @property
+    def status(self):
+        return self._provider_settings('status')
+
+    @status.setter
+    def status(self, value):
+        self._provider_settings('status', value)
+
+    def toggle_status(self):
+        if self.status == 'enabled':
+            self.status = 'disabled'
+        else:
+            self.status = 'enabled'

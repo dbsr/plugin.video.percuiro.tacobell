@@ -1,31 +1,38 @@
+# -*- coding: utf-8 -*-
+# dydrmntion@gmail.com
 
 import os
-import sys
-sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                             '../resources/percuiro_lib'))
 import cPickle
+import tempfile
+import shutil
 
-from percuiro import get_active_providers
+from percuiro import get_providers
 
 
-fixtures = dict(
-    downtr_co=dict(
+fixtures = {
+    'downtr.co': dict(
         num_search_results=2,
         num_link_results=2),
-    filestube_com=dict(
+    'filestube.com': dict(
         num_search_results=10,
         num_link_results=1),
-    theextopia_com=dict(
+    'theextopia.com': dict(
         num_search_results=4,
-        num_link_results=1))
+        num_link_results=14)
+}
 
-providers = []
-for provider in get_active_providers().values():
-    providers.append((
+plugin_path = os.path.join(tempfile.gettempdir(), '_percuiro_test')
+
+providers = map(
+    lambda provider: (
         provider, 
         fixtures[provider.name], 
         cPickle.load(open(os.path.join(os.path.dirname(os.path.realpath(
-            __file__)), 'pickles/' + provider.name + '.pickle')))))
+                __file__)), 'pickles/' + provider.name + '.pickle')))
+    ),
+    get_providers().values())
+
+
 
 
 def test_search_results():
@@ -46,6 +53,6 @@ def check_search_results(provider, num_search_results, soup):
 
 def check_link_results(provider, num_link_results, soup):
     results = provider._parse_link_page(soup)
-    print '\n' + provider.name
-    print results
     assert len(results) == num_link_results
+
+
