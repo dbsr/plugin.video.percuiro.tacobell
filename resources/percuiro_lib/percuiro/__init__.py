@@ -6,7 +6,6 @@ from provider import Provider, PluginProvider
 
 
 providers_dict = dict((provider['name'], provider) for provider in providers)
-print providers_dict
 
 
 def get_providers():

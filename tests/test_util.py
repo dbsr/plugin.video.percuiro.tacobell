@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 # dydrmntion@gmail.com
 
-from percuiro.util import (is_debrid_host, label_from_link, query_in_label,
-                           get_website_logo)
+from percuiro.util import is_debrid_host, label_from_link, query_in_label
 
 
 def test_is_debrid_host():
@@ -14,7 +13,7 @@ def test_is_debrid_host():
 
 def test_label_from_link():
     link = 'http://rapidgator.net/file/b9ab1a38f5e9fb691ecf2920d7cb7dca'
-    label = label_from_link(link) 
+    label = label_from_link(link)
     assert label == 'RAPIDGATOR.NET       b9ab1a38f5e9fb691ecf2920d7cb7dca'
 
 
