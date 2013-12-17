@@ -31,5 +31,15 @@ providers = (
         result_title=lambda result: result.find('div', {'class': 'title'}).text,
         result_link=lambda result: result.find('a', {'rel': 'bookmark'}).get('href'),
         thumbnail_url='http://www.theextopia.com/wp-content/themes/mobipress-theme/images/blogname.png'
+    ),
+    dict(
+        name='rapidlibrary.biz',
+        base_url='http://rapidlibrary.biz',
+        query_url=lambda query: 'http://rapidlibrary.biz/{}/{}.html'.format(
+            query[0], query.replace('+', '-')),
+        result_selector=[('h3',)],
+        result_title=lambda soup: soup.find('a').text,
+        result_link=lambda soup: soup.find('a').get('href'),
+        thumbnail_url='http://filespart.com/static/img/logo.png'
     )
 )
