@@ -1,16 +1,14 @@
-# Percuiro Taco Bell
-
 ### plugin.video.percuiro.tacobell
----
+# Percuiro Taco Bell
 
 ### Description
 Percurio Taco Bell is a video plugin for xbmc. You can use it to search for
-video files using a combination of search providers.
-The providers which are included by default are filestube, theextopia and downtr.
+video files using a combination of search providers. 
+Filestube, theextopia and downtr are the default search providers.
 
 
 ### Features
-- Search & Play
+- Search & Play 
     This will search all providers in turn (sorted by customizable provider
     priority) until it finds a playable result. Playable means the file exists
     on the filehost in question and is resolvable to a link the user can 
