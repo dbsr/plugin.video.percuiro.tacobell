@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 # dydrmntion@gmail.com
 
-import os
 import re
-import urllib
 
 import requests
 from BeautifulSoup import BeautifulSoup
@@ -12,9 +10,9 @@ import util
 
 
 class Provider(object):
-    def __init__(self, name, base_url, query_url, result_selector, 
-            result_title, result_link, *args, **kwargs):
-        '''The Provider class is used by all provider definition to search 
+    def __init__(self, name, base_url, query_url, result_selector,
+                 result_title, result_link, *args, **kwargs):
+        '''The Provider class is used by all provider definition to search
         and parse results.
 
         Args:
@@ -37,23 +35,10 @@ class Provider(object):
         self.result_link = result_link
 
     def __repr__(self):
-        return '<percuiro.Provider:' + self.name + '>'
-
-    @property
-    def provider_logo(self):
-        ext = self.logo_url.split('.')[-1]
-        destination = os.path.join(self.logos_path, 
-            '{}.{}'.format(hash(self.logo_url), ext).strip('-'))
-        if not os.path.exists(destination):
-            try:
-                urllib.urlretrieve(self.logo_url, destination)
-            except (OSError, IOError) as e:
-                print e
-                destination = None
-        return destination
+        return '<percuiro.Provider: ' + self.name + '>'
 
     def _req_soup(self, url):
-        '''Returns souped result of http request.
+        '''Returns souped result of the url request.
 
         Args:
             url (str): the url to request.
@@ -67,7 +52,7 @@ class Provider(object):
         return BeautifulSoup(req.content)
 
     def _selector_chain(self, chain, soup):
-        '''Sequentially iterates over soup / results using the selectors in 
+        '''Sequentially iterates over soup / results using the selectors in
         the chain.
 
         Args:
@@ -143,7 +128,7 @@ class Provider(object):
         '''Parses result page for playable url links.
 
         Args:
-            url (str): the url to retrieve, soup, and look for supported 
+            url (str): the url to retrieve, soup, and look for supported
                        hoster urls in.
 
         Returns:
@@ -153,7 +138,7 @@ class Provider(object):
         return self._parse_link_page(soup)
 
     def _parse_link_page(self, soup):
-        return  map(
+        return map(
             lambda link: dict(
                 label=util.label_from_link(link),
                 url=link),
@@ -170,7 +155,7 @@ class Provider(object):
 class PluginProvider(Provider):
     def __init__(self, plugin, thumbnail_url, *args, **kwargs):
         '''
-        Subclassed to keep xbmc dependencies separated from main 
+        Subclassed to keep xbmc dependencies separated from main
         class for easier testing. The Pluginprovider class provides
         xbmc settings get and setters for the provider.
 
@@ -182,13 +167,13 @@ class PluginProvider(Provider):
         Provider.__init__(self, *args, **kwargs)
         if not self.priority:
             self.priority = 100
-        if self.status == None:
+        if not self.status:
             self.status = 'enabled'
-    
+
     @property
     def thumbnail(self):
         return util.get_provider_thumbnail(self.plugin.storage_path,
-            self.thumbnail_url)
+                                           self.thumbnail_url)
 
     def _provider_settings(self, key, value=None):
         settings = self.plugin.get_storage('provider_settings')
@@ -222,7 +207,4 @@ class PluginProvider(Provider):
         self._provider_settings('status', value)
 
     def toggle_status(self):
-        if self.status == 'enabled':
-            self.status = 'disabled'
-        else:
-            self.status = 'enabled'
+        self.status = 'enabled' if self.status == 'disabled' else 'disabled'
