@@ -36,9 +36,9 @@ Filestube, theextopia and downtr are the default search providers.
 This addon uses the module urlresolver to resolve search results to playable links. Without a subscribtion
 of some kind to a premium (multi) file host you will be one sad donkey.
 
-### ?Por qu? lo llamas percuiro Taco Bell? 
+### ?Por que lo llamas percuiro Taco Bell? 
 
-*Me gustan mucho los tacos y mi espa?ol es terrible.*
+*Me gustan mucho los tacos y mi espanol es terrible.*
 
 ### Contact 
 
