@@ -2,6 +2,7 @@
 # dydrmntion@gmail.com
 
 import re
+from types import FunctionType
 
 import requests
 from BeautifulSoup import BeautifulSoup
@@ -11,7 +12,7 @@ import util
 
 class Provider(object):
     def __init__(self, name, base_url, query_url, result_selector,
-                 result_title, result_link, *args, **kwargs):
+                 result_title, result_link, next_page_format=None, *args, **kwargs):
         '''The Provider class is used by all provider definition to search
         and parse results.
 
@@ -26,6 +27,9 @@ class Provider(object):
                                    of a single result and returns the title (str).
             result_link (lambda): expects a BeautifulSoup.BeautifulSoup object
                                   of a single result and returs the url (str).
+            next_page_format (regex): a regex capturing the page parameter of
+                                      provider's result urls. If None provider
+                                      expects anchor with 'next'.
         '''
         self.name = name
         self.base_url = base_url
@@ -33,6 +37,7 @@ class Provider(object):
         self.result_selector = result_selector
         self.result_title = result_title
         self.result_link = result_link
+        self.next_page_format = next_page_format
 
     def __repr__(self):
         return '<percuiro.Provider: ' + self.name + '>'
@@ -90,39 +95,68 @@ class Provider(object):
             a list of result dictionaries.
 
         '''
+        query = query.replace(' ', '+')
         try:
-            url = self.query_url.format(query=query.replace(' ', '+'))
+            url = self.query_url.format(query=query)
         except AttributeError:
-            return []
+            if isinstance(self.query_url, FunctionType):
+                url = self.query_url(query)
+            else:
+                print 'invalid query_url'
+                return []
+        print url
         soup = self._req_soup(url)
-        return self._parse_search_results(soup)
+        return self._parse_search_results(soup, url)
 
-    def _parse_search_results(self, soup):
-        results = map(
-            lambda result: dict(
-                label=self.result_title(result).encode('utf8'),
-                url=self.result_link(result)),
-            self._selector_chain(self.result_selector, soup))
-        next_page = self._get_next_page_url(soup)
+    def _parse_search_results(self, soup, url):
+        results = []
+        for result in self._selector_chain(self.result_selector, soup):
+            try:
+                results.append(dict(
+                    label=self.result_title(result).encode('utf8'),
+                    url=self.result_link(result).encode('utf8')))
+            except AttributeError:
+                pass
+        results = filter(
+            lambda result: not re.search(
+                r'\.?(?:rar|zip)',
+                ' '.join(result.values())),
+            results)
+        next_page = self._get_next_page_url(soup, url)
         if next_page:
             results.append(dict(
                 label='Next >>',
                 url=next_page))
         return results
 
-    def _get_next_page_url(self, soup):
+    def _get_next_page_url(self, soup, url):
         '''Parses the soup of the result page and looks for a link pointing
         to the next page of the result set.
 
         Args:
             soup (BeautifulSoup.BeautifulSoup): The souped html result.
+            url (str): the url for the current result soup
 
         Returns:
             the url of the next page or None if none found.
         '''
+        if self.next_page_format:
+            m = re.match(self.next_page_format, url)
+            if m:
+                next_page_num = str(int(m.group(1)) + 1)
+            else:
+                next_page_num = '2'
+            is_next = lambda a: re.match(
+                self.next_page_format.replace('([0-9]+)', next_page_num),
+                a.get('href'))
+        else:
+            is_next = lambda a: 'next' in a.text.lower()
+
         for a in soup.findAll('a'):
-            if 'next' in a.text.lower() and a.get('href') != '#':
-                return a.get('href')
+            href = a.get('href', '')
+            if href.startswith('/') or self.base_url in href:
+                if is_next(a):
+                    return href
 
     def get_link_page(self, url):
         '''Parses result page for playable url links.
@@ -149,7 +183,8 @@ class Provider(object):
 
     def parse_next_page(self, url):
         soup = self._req_soup(url)
-        return self._parse_search_results(soup)
+        print url
+        return self._parse_search_results(soup, url)
 
 
 class PluginProvider(Provider):
