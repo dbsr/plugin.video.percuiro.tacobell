@@ -8,35 +8,21 @@ import requests
 from BeautifulSoup import BeautifulSoup
 
 import util
+import common
 
 
 class Provider(object):
     def __init__(self, name, base_url, query_url, result_selector,
-                 result_title, result_link, next_page_format=None, *args, **kwargs):
+                 get_result_label, get_result_url, next_page_format=None, **kwargs):
         '''The Provider class is used by all provider definition to search
         and parse results.
-
-        Args:
-            name (str): the name of the provider.
-            base_url (str): the base url of the provider.
-            query_url (str): the url used to query the provider, Provider expects
-                             to have it a {query} placeholder.
-            result_selector (list): the selector chained used on the html result
-                                    of the query.
-            result_title (lambda): expects a BeautifulSoup.BeautifulSoup object
-                                   of a single result and returns the title (str).
-            result_link (lambda): expects a BeautifulSoup.BeautifulSoup object
-                                  of a single result and returs the url (str).
-            next_page_format (regex): a regex capturing the page parameter of
-                                      provider's result urls. If None provider
-                                      expects anchor with 'next'.
         '''
         self.name = name
         self.base_url = base_url
         self.query_url = query_url
         self.result_selector = result_selector
-        self.result_title = result_title
-        self.result_link = result_link
+        self.get_result_label = get_result_label
+        self.get_result_url = get_result_url
         self.next_page_format = next_page_format
 
     def __repr__(self):
@@ -104,24 +90,28 @@ class Provider(object):
             else:
                 print 'invalid query_url'
                 return []
-        print url
         soup = self._req_soup(url)
-        return self._parse_search_results(soup, url)
+        return self._parse_results_page(soup, url)
 
-    def _parse_search_results(self, soup, url):
+    def _parse_results_page(self, soup, url):
         results = []
-        for result in self._selector_chain(self.result_selector, soup):
+        for soup_result in self._selector_chain(self.result_selector, soup):
             try:
-                results.append(dict(
-                    label=self.result_title(result).encode('utf8'),
-                    url=self.result_link(result).encode('utf8')))
-            except AttributeError:
-                pass
-        results = filter(
-            lambda result: not re.search(
-                r'\.?(?:rar|zip)',
-                ' '.join(result.values())),
-            results)
+                result = dict(
+                    label=self.get_result_label(soup_result).encode('utf8'),
+                    url=self.get_result_url(soup_result).encode('utf8'))
+            except AttributeError as e:
+                print e
+                continue
+            result_text = soup_result.text.encode('utf8')
+            host_match = re.search(common.REAL_DEBRID_REGEX, result_text)
+            if host_match:
+                result['host'] = host_match.group(0)
+            ext_match = re.search(common.FILE_EXTENSIONS_REGEX, result_text)
+            if ext_match:
+                result['ext'] = ext_match.group(0).strip('.')
+            if util.is_valid_result(result):
+                results.append(result)
         next_page = self._get_next_page_url(soup, url)
         if next_page:
             results.append(dict(
@@ -183,8 +173,7 @@ class Provider(object):
 
     def parse_next_page(self, url):
         soup = self._req_soup(url)
-        print url
-        return self._parse_search_results(soup, url)
+        return self._parse_results_page(soup, url)
 
 
 class PluginProvider(Provider):

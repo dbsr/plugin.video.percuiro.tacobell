@@ -13,11 +13,14 @@ fixtures = {
         num_search_results=2,
         num_link_results=2),
     'filestube.com': dict(
-        num_search_results=11,
+        num_search_results=10,
         num_link_results=1),
     'theextopia.com': dict(
         num_search_results=4,
-        num_link_results=14)
+        num_link_results=14),
+    'rapidlibrary.biz': dict(
+        num_search_results=1,
+        num_link_results=1)
 }
 
 plugin_path = os.path.join(tempfile.gettempdir(), '_percuiro_test')
@@ -43,7 +46,7 @@ def test_link_results():
 
 
 def check_search_results(provider, num_search_results, soup):
-    results = provider._parse_search_results(soup)
+    results = provider._parse_results_page(soup, '')
     assert len(results) == num_search_results
 
 

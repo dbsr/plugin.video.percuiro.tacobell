@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 # dydrmntion@gmail.com
 
-from percuiro.util import is_debrid_host, label_from_link, query_in_label
+from percuiro.util import (is_debrid_host, label_from_link, query_in_label,
+                           is_valid_result)
 
 
 def test_is_debrid_host():
@@ -23,3 +24,21 @@ def test_query_in_label():
     not_in_label = 'Breaking_Bad_S04E2_720p_HDTV.x264'
     assert query_in_label(query, in_label)
     assert not query_in_label(query, not_in_label)
+
+
+def test_is_valid_result():
+    result = dict(
+        label='Monty Python Holy Grail 720p MKV',
+        link='http://rapidgator.com/?file=blah',
+        ext='mkv',
+        host=None)
+    assert is_valid_result(result)
+    # rar in label
+    result['label'] = 'blah.rar'
+    assert not is_valid_result(result)
+    # unsupported filehost
+    result['label'] = 'blah.mkv'
+    result['host'] = 'http://www.google.com'
+    assert not is_valid_result(result)
+    # not enough keys
+    assert not is_valid_result({})

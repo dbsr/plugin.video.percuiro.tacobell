@@ -5,6 +5,7 @@ import json
 
 from xbmcswift2 import Plugin, xbmc
 import urlresolver
+from urlresolver.types import HostedMediaFile
 
 from percuiro import util, get_plugin_providers, get_plugin_provider
 
@@ -113,6 +114,13 @@ def resolve_provider_page(provider, url, label):
         results = p.parse_next_page(url)
         return list_results(results, provider)
     results = p.get_link_page(url)
+    if len(results) == 1:
+        plugin.notify(msg='Link succesfully resolved..')
+        hosted = HostedMediaFile(url=results[0]['url'])
+        resolved = hosted.resolve()
+        if resolved:
+            xbmc.Player().play(resolved)
+        return
     return map(
         lambda result: dict(
             label=result['label'],

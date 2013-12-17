@@ -9,7 +9,7 @@ import subprocess
 from urlparse import urlparse
 import urllib
 
-from common import REAL_DEBRID_REGEX, PROVIDERS_THUMBNAIL_PATH
+from common import REAL_DEBRID_REGEX, PROVIDERS_THUMBNAIL_PATH, FILTER_EXTENSIONS
 
 def clipboard_paste():
     ret = ''
@@ -57,3 +57,15 @@ def get_provider_thumbnail(plugin_profile_path, url):
                 url, destination)
             return
     return destination
+
+
+def is_valid_result(result):
+    if len(result) < 2:
+        return False
+    if result.get('ext', '').strip('.') in FILTER_EXTENSIONS:
+        return False
+    if result.get('host') and not is_debrid_host(result['host']):
+        return False
+    if re.search(r'\.?(?:rar|zip)', str(result)):
+        return False
+    return True
