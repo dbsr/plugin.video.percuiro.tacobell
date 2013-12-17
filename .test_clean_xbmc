@@ -1,0 +1,9 @@
+#!/bin/sh
+mv $HOME/.xbmc $HOME/__xbmc
+mkdir -p $HOME/.xbmc/addons
+ln -s $HOME/__xbmc/addons/script.module.urlresolver $HOME/.xbmc/addons
+unzip *zip
+mv plugin.video.percuiro.tacobell $HOME/.xbmc/addons
+xbmc
+rm -rf $HOME/.xbmc
+mv $HOME/__xbmc $HOME/.xbmc
