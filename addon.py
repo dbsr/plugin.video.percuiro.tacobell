@@ -25,7 +25,11 @@ def index():
         ),
         dict(
             label='providers settings',
-            path=plugin.url_for('provider_settings'))]
+            path=plugin.url_for('provider_settings')
+        ),
+        dict(
+            label='urlresolver settings',
+            path=plugin.url_for('urlresolver_settings'))]
     items.extend(map(
         lambda provider: dict(
             label=provider.name,
@@ -145,7 +149,7 @@ def provider_settings(provider=None, setting=None):
         else:
             p.toggle_status()
     items = []
-    for provider in get_plugin_providers(plugin):
+    for provider in get_plugin_providers(plugin, include_disabled=True):
         items.extend([
             dict(
                 label=provider.name,
