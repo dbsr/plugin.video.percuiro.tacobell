@@ -1,0 +1,3 @@
+[console_scripts]
+xbmcswift2 = xbmcswift2.cli.cli:main
+
