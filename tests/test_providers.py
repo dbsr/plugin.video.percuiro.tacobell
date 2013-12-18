@@ -30,7 +30,7 @@ providers = map(
         provider,
         fixtures[provider.name],
         cPickle.load(open(os.path.join(os.path.dirname(os.path.realpath(
-            __file__)), 'pickles/' + provider.name + '.pickle')))
+            __file__)), 'test_data/pickles/' + provider.name + '.pickle')))
     ),
     get_providers().values())
 
