@@ -17,8 +17,13 @@ def import_user_providers(my_providers_fpath):
     fname = os.path.basename(my_providers_fpath)
     fpath = os.path.dirname(my_providers_fpath)
     sys.path.append(fpath)
-    user_providers = __import__(fname.rstrip('.py'))
-    sys.path.remove(fpath)
+    try:
+        user_providers = __import__(fname.rstrip('.py'))
+    except ImportError as e:
+        raise PercuiroUserProvidersException('Could not import `{}`: {!r}'.format(
+            my_providers_fpath, e.message))
+    finally:
+        sys.path.remove(fpath)
     return user_providers
 
 

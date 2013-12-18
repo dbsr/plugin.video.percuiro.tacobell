@@ -26,6 +26,11 @@ def test_import_my_providers():
         import_user_providers('/__if_this_exists_itd_be_weird/lol.py')
     test_does_not_exist()
 
+    @raises(PercuiroUserProvidersException)
+    def test_could_not_import():
+        import_user_providers(user_providers_fpath.replace('.py', '.foo'))
+    test_could_not_import()
+
 
 def test_validate_user_profiles():
     my_providers = MockMyProvidersModule()
