@@ -3,6 +3,7 @@ find . -type f -name *.pyc|xargs rm
 version=$(git tag|head -1)
 zip_file="plugin.video.percuiro.tacobell.$version.zip"
 cd ..
-zip -r plugin.video.percuiro.tacobell/$zip_file plugin.video.percuiro.tacobell  -x plugin.video.percuiro.tacobell/.git\* plugin.video.percuiro.tacobell/tests\*
+zip -r plugin.video.percuiro.tacobell/$zip_file plugin.video.percuiro.tacobell  -x plugin.video.percuiro.tacobell/.git\* plugin.video.percuiro.tacobell/tests\* plugin.video.percuiro.tacobell/\*zip
+
 cd plugin.video.percuiro.tacobell
 git add $zip_file && git commit -m 'new zip' && git push
