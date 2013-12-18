@@ -1,0 +1,6 @@
+<settings>
+    <category label="My Providers">
+        <setting id="user_providers_fpath" type="file" label="Location of my_providers.py"/>
+  </category>
+</settings>
+
