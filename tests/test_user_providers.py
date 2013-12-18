@@ -5,8 +5,9 @@ import os
 
 from nose.tools import raises
 from percuiro.user_providers import (
-    import_user_providers, validate_user_providers_module,
+    import_user_providers, validate_user_providers_module, validate_provider,
     PercuiroUserProvidersException)
+from percuiro.providers import providers
 
 
 class MockMyProvidersModule(object):
@@ -32,7 +33,7 @@ def test_import_my_providers():
     test_could_not_import()
 
 
-def test_validate_user_profiles():
+def test_validate_user_providers():
     my_providers = MockMyProvidersModule()
 
     @raises(PercuiroUserProvidersException)
@@ -48,4 +49,17 @@ def test_validate_user_profiles():
     my_providers_no_tuple()
 
     my_providers.my_providers = tuple()
-    assert validate_user_providers_module(my_providers)
+    assert validate_user_providers_module(my_providers) is not None
+
+
+def test_validate_provider():
+    # default providers should pass
+    for provider in providers:
+        assert validate_provider(provider)
+    provider = providers[0]
+    provider['next_page_format'] = r'foo'
+
+    @raises(PercuiroUserProvidersException)
+    def invalid_regex_format():
+        validate_provider(provider)
+    invalid_regex_format()

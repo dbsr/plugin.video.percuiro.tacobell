@@ -7,7 +7,8 @@ from xbmcswift2 import Plugin, xbmc
 import urlresolver
 from urlresolver.types import HostedMediaFile
 
-from percuiro import util, get_plugin_providers, get_plugin_provider
+from percuiro import (util, get_plugin_providers, get_plugin_provider,
+                      user_providers)
 
 plugin = Plugin()
 
@@ -205,5 +206,18 @@ def get_keyboard_query():
     return query
 
 
+def init_user_providers():
+    plugin.user_providers = []
+    user_providers_fpath = plugin.get_setting('user_providers_fpath')
+    if user_providers_fpath:
+        try:
+            my_providers = user_providers.get_user_providers(user_providers_fpath)
+        except user_providers.PercuiroUserProvidersException as e:
+            plugin.notify(msg=e.message)
+        else:
+            plugin.user_providers = my_providers
+
+
 if __name__ == '__main__':
+    init_user_providers()
     plugin.run()
