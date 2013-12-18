@@ -30,7 +30,7 @@ def is_debrid_host(href):
 
 def label_from_link(link):
     purl = urlparse(link)
-    return '{:<20} {}'.format(purl.netloc.upper(), os.path.basename(link))
+    return '{0:<20} {1}'.format(purl.netloc.upper(), os.path.basename(link))
 
 
 def query_in_label(query, label):
@@ -48,12 +48,12 @@ def get_provider_thumbnail(plugin_profile_path, url):
         os.mkdir(provider_thumbnails_path)
     destination = os.path.join(
         provider_thumbnails_path, 
-        '{}.{}'.format(str(hash(url)), ext).strip('-'))
+        '{0}.{1}'.format(str(hash(url)), ext).strip('-'))
     if not os.path.exists(destination):
         try: 
             urllib.urlretrieve(url, destination)
         except IOError as e:
-            print 'Error retrieving provider thumbnail: {} -> {}.'.format(
+            print 'Error retrieving provider thumbnail: {0} -> {1}.'.format(
                 url, destination)
             return
     return destination

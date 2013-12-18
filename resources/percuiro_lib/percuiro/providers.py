@@ -106,7 +106,7 @@ providers = (
     dict(
         name='rapidlibrary.biz',
         base_url='http://rapidlibrary.biz',
-        query_url=lambda query: 'http://rapidlibrary.biz/{}/{}.html'.format(
+        query_url=lambda query: 'http://rapidlibrary.biz/{0}/{1}.html'.format(
             query[0], query.replace('+', '-')),
         result_selector=[('ol', {'class': 'results-list'}), ('li',)],
         get_result_label=lambda soup: soup.find('a').text,

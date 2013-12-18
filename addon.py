@@ -58,12 +58,12 @@ def search_and_play():
     '''
     query = get_keyboard_query()
     for provider in get_plugin_providers(plugin):
-        plugin.notify(msg='Querying {}...'.format(provider.name))
+        plugin.notify(msg='Querying {0}...'.format(provider.name))
         results = provider.search(query)
         for result in filter(
                 lambda result: util.query_in_label(query, result['label']),
                 results):
-            plugin.notify(msg='{}: Resolving link: {}'.format(provider.name,
+            plugin.notify(msg='{1}: Resolving link: {0}'.format(provider.name,
                           result['url']))
             links = provider.get_link_page(result['url'])
             for link in links:
@@ -71,7 +71,7 @@ def search_and_play():
                 if resolved:
                     xbmc.Player().play(resolved)
                     return
-                plugin.notify(msg='Failed resolving: {}'.format(link['url']))
+                plugin.notify(msg='Failed resolving: {0}'.format(link['url']))
 
 
 @plugin.route('/global-search/<next_pages>', name='global_search_next')
@@ -81,13 +81,13 @@ def global_search(next_pages=None):
     if next_pages:
         next_pages = json.loads(next_pages)
         for provider_name, url in next_pages:
-            plugin.notify(msg='Requesting next page for {}..'.format(provider_name))
+            plugin.notify(msg='Requesting next page for {0}..'.format(provider_name))
             provider = get_plugin_provider(plugin, provider_name)
             provider_results.append((provider_name, provider.parse_next_page(url)))
     else:
         query = get_keyboard_query()
         for provider in get_plugin_providers(plugin):
-            plugin.notify(msg='Querying {}..'.format(provider.name))
+            plugin.notify(msg='Querying {0}..'.format(provider.name))
             provider_results.append((provider.name, provider.search(query)))
     items = []
     next_pages = []
@@ -97,7 +97,7 @@ def global_search(next_pages=None):
                 next_pages.append((provider_name, results.pop(-1)['url']))
             results = list_results(results, provider_name, indentation=4)
             results.insert(0, dict(
-                label='{} results:'.format(provider_name).upper(),
+                label='{0} results:'.format(provider_name).upper(),
                 path=plugin.url_for('_nowhere')))
             items.extend(results)
     if next_pages:
@@ -150,7 +150,7 @@ def provider_settings(provider=None, setting=None):
             # ask user for priority using keyboard
             priority = plugin.keyboard(
                 default=str(p.priority),
-                heading='Please enter new priority for {}'.format(p.name))
+                heading='Please enter new priority for {0}'.format(p.name))
             try:
                 p.priority = priority
             except ValueError as e:
@@ -166,14 +166,14 @@ def provider_settings(provider=None, setting=None):
                 thumbnail=provider.thumbnail
             ),
             dict(
-                label='    status    =   {}'.format(provider.status),
+                label='    status    =   {0}'.format(provider.status),
                 path=plugin.url_for(
                     'provider_settings_set',
                     provider=provider.name, setting='status'),
                 thumbnail=provider.thumbnail
             ),
             dict(
-                label='    priority  =  {}'.format(provider.priority),
+                label='    priority  =  {0}'.format(provider.priority),
                 path=plugin.url_for(
                     'provider_settings_set',
                     provider=provider.name,

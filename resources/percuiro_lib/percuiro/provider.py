@@ -217,7 +217,7 @@ class PluginProvider(Provider):
         try:
             priority = int(value)
         except ValueError:
-            raise ValueError('{!r} is not a valid priority value'.format(priority))
+            raise ValueError('{0:!r} is not a valid priority value'.format(priority))
         if priority < 0 or priority > 100:
             raise ValueError('Priority value must be between 0 and 100')
         self._provider_settings('priority', priority)

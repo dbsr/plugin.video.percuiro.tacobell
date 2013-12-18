@@ -22,7 +22,7 @@ def get_user_providers(user_providers_fpath):
 def import_user_providers(user_providers_fpath):
     if not os.path.exists(user_providers_fpath):
         raise PercuiroUserProvidersException(
-            '{!r} does not exist on filesystem'.format(user_providers_fpath))
+            '{0:!r} does not exist on filesystem'.format(user_providers_fpath))
 
     fname = os.path.basename(user_providers_fpath)
     fpath = os.path.dirname(user_providers_fpath)
@@ -30,7 +30,7 @@ def import_user_providers(user_providers_fpath):
     try:
         user_providers = __import__(fname.rstrip('.py'))
     except ImportError as e:
-        raise PercuiroUserProvidersException('Could not import `{}`: {!r}'.format(
+        raise PercuiroUserProvidersException('Could not import `{0}`: {1:!r}'.format(
             user_providers_fpath, e.message))
     finally:
         sys.path.remove(fpath)
@@ -46,7 +46,7 @@ def validate_user_providers_module(user_providers_module):
 
     if not isinstance(user_providers, tuple):
         raise PercuiroUserProvidersException(
-            'user_providers variable should be a `tuple`, `{}` found.'.format(
+            'user_providers variable should be a `tuple`, `{0}` found.'.format(
                 type(user_providers)))
     return user_providers
 
@@ -83,12 +83,12 @@ def validate_provider(provider):
         if not val:
             if k not in ['next_page_format', 'thumbnail_url']:
                 raise PercuiroUserProvidersException(
-                    '{} provider validation key error: {!r} not in dictionary'.format(
+                    '{0} provider validation key error: {1:!r} not in dictionary'.format(
                         provider.get('name', 'UNKNOWN_NAME'), k))
             else:
                 continue
         if not v(val):
             raise PercuiroUserProvidersException(
-                '{} provider validation invalid value error: {}, {}'.format(
+                '{0} provider validation invalid value error: {}, {}'.format(
                     provider.get('name', 'UNKNOWN_NAME'), k, val))
     return True

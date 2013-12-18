@@ -23,4 +23,4 @@ PROVIDERS_THUMBNAIL_PATH = 'provider_thumbnails'
 
 FILTER_EXTENSIONS = 'rar', 'zip', 'exe', 'pdf', 'mp3', 'epub'
 VIDEO_EXTENSIONS = 'mkv', 'avi', 'mp4', 'wmv', 'flv', 'mpeg', 'mpg'
-FILE_EXTENSIONS_REGEX = r'\.({})'.format('|'.join(FILTER_EXTENSIONS + VIDEO_EXTENSIONS))
+FILE_EXTENSIONS_REGEX = r'\.({0})'.format('|'.join(FILTER_EXTENSIONS + VIDEO_EXTENSIONS))
