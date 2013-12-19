@@ -17,13 +17,15 @@ PROVIDER DICTIONARY KEYWORDS:
         Percuiro will add this to the base_url
         (http://ohhi.com/foo) before it makes the request.
 
-    query_url (str|lambda):
-        When (str):
-            The url used by percuiro to query the provider. Percuiro expects
-            this str to have a `{query}` placeholder.
-        When (lambda):
-            This lambda should take the query keywords (str) as its only
-            argument and return the query url used by percuiro.
+    query_url (str|lambda|tuple):
+        The url used by percuiro to query the provider.
+        When its a str Percuiro expects it to have a `{query}` placeholder.
+        When its a lambda it should take the query as its argument and return
+        an url.
+        When its a tuple percuiro assumes the query method should be post. Its'
+        first item should be the full action post url, the second value should
+        be the name of the the post data.
+
     result_selector (list):
         A list of tuples where each tuple is a selector step to get to
         the query result(s). If you're familiar with jQuery or BeautifulSoup

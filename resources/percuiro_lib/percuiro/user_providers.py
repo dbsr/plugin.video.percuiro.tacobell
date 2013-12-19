@@ -63,7 +63,8 @@ def validate_provider(provider):
             is_url
         ), (
             'query_url',
-            lambda x: is_url(x) and '{query}' in x or is_function(x)
+            lambda x: (is_url(x) and '{query}' in x or is_function(x) or
+                       isinstance(x, tuple) and len(x) == 2)
         ), (
             'result_selector',
             lambda x: isinstance(x, list) and len(x) > 0

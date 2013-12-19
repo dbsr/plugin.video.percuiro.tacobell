@@ -28,7 +28,7 @@ class Provider(object):
     def __repr__(self):
         return '<percuiro.Provider: ' + self.name + '>'
 
-    def _req_soup(self, url):
+    def _req_soup(self, url, post_data=None):
         '''Returns souped result of the url request.
 
         Args:
@@ -39,7 +39,10 @@ class Provider(object):
         '''
         if not url.startswith('http'):
             url = self.base_url + url
-        req = requests.get(url)
+        if post_data:
+            req = requests.post(url, data=post_data)
+        else:
+            req = requests.get(url)
         return BeautifulSoup(req.content)
 
     def _selector_chain(self, chain, soup):
@@ -81,15 +84,18 @@ class Provider(object):
             a list of result dictionaries.
 
         '''
+        if isinstance(self.query_url, tuple):
+            # assume we need to use post in our query request
+            url, post_key = self.query_url
+            soup = self._req_soup(url, post_data={
+                post_key: query})
+            return soup
         query = query.replace(' ', '+')
         try:
             url = self.query_url.format(query=query)
         except AttributeError:
             if isinstance(self.query_url, FunctionType):
-                url = self.query_url(query)
-            else:
-                print 'invalid query_url'
-                return []
+                url = self.query_url(url)
         soup = self._req_soup(url)
         return self._parse_results_page(soup, url)
 
