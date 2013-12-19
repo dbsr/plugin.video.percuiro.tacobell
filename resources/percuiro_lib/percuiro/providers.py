@@ -116,6 +116,6 @@ providers = (
         result_selector=[('ol', {'class': 'results-list'}), ('li',)],
         get_result_label=lambda soup: soup.find('a').text,
         get_result_url=lambda soup: soup.find('a').get('href'),
-        thumbnail_url='http://filespart.com/static/img/logo.png'
+        thumbnail_url='http://rapidlibrary.biz/images/logo-small.png'
     )
 )

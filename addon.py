@@ -67,7 +67,7 @@ def search(provider=None):
                 label='search {0}'.format(provider.name),
                 path=plugin.url_for('search_provider', provider=provider.name),
                 thumbnail=provider.thumbnail),
-            get_plugin_providers(plugin))
+            get_plugin_providers(plugin, include_disabled=True))
 
 
 @plugin.route('/search-and-play')
@@ -183,23 +183,35 @@ def provider_settings(provider=None, setting=None):
                 plugin.notice(msg=e.message, title='ERROR!')
         else:
             p.toggle_status()
-    items = []
+    items = [
+        dict(
+            label='PROVIDER SETTINGS:',
+            path=no_click()
+        ),
+        dict(
+            label=' priority = determines which provider is used first.',
+            path=no_click()
+        ),
+        dict(
+            label=' enabled = use provider for global search and search & play.',
+            path=no_click()
+        )]
     for provider in get_plugin_providers(plugin, include_disabled=True):
         items.extend([
             dict(
-                label=provider.name,
+                label='{0}'.format(provider.name),
                 path=plugin.url_for('_nowhere'),
                 thumbnail=provider.thumbnail
             ),
             dict(
-                label='    status    =   {0}'.format(provider.status),
+                label='  status    =   {0}'.format(provider.status),
                 path=plugin.url_for(
                     'provider_settings_set',
                     provider=provider.name, setting='status'),
                 thumbnail=provider.thumbnail
             ),
             dict(
-                label='    priority  =  {0}'.format(provider.priority),
+                label='  priority  =  {0}'.format(provider.priority),
                 path=plugin.url_for(
                     'provider_settings_set',
                     provider=provider.name,
