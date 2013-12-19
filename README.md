@@ -65,7 +65,7 @@ Filestube, theextopia and downtr are the default search providers.
   to the elements containing information about the results we are
   interested in.
 
-- get_result_label (lambda):a
+- get_result_label (lambda):
 
   This should be a lambda (function) which takes one argument, a soup
   object of one result element. It should return a str which percuiro
@@ -84,10 +84,14 @@ Filestube, theextopia and downtr are the default search providers.
   Example:
     `
         A provider uses this url for the 2nd page of results:
+
             http://provider.net/?q=blah&p=2
+
         A good regex_str in this case would be:
+
             r'.*&p=([0-9]+)$'
-        Note: don't forget the capture braces. Percuiro uses this to
+
+        Note  don't forget the capture braces. Percuiro uses this to
         increment from the current page to the next.
     `
 - thumbnail_url (str):
