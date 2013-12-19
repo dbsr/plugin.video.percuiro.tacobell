@@ -252,7 +252,7 @@ def get_keyboard_query():
 
 
 def init_user_providers():
-    plugin.user_providers = []
+    plugin.user_providers = tuple()
     user_providers_fpath = plugin.get_setting('user_providers_fpath')
     if user_providers_fpath:
         try:
