@@ -11,42 +11,63 @@ from percuiro import (util, get_plugin_providers, get_plugin_provider,
                       user_providers)
 
 plugin = Plugin()
+no_click = lambda: plugin.url_for('_nowhere')
 
 
 @plugin.route('/')
 def index():
-    providers = get_plugin_providers(plugin)
     items = [
         dict(
             label='search & play',
             path=plugin.url_for('search_and_play'),
         ),
         dict(
-            label='search enabled providers',
+            label='search all providers',
             path=plugin.url_for('global_search')
         ),
         dict(
-            label='providers settings',
+            label='search specific provider',
+            path=plugin.url_for('search')
+        ),
+        dict(
+            label='settings:',
+            path=no_click()
+        ),
+        dict(
+            label='  percuiro settings',
+            path=plugin.url_for('percuiro_settings')
+        ),
+        dict(
+            label='  providers settings',
             path=plugin.url_for('provider_settings')
         ),
         dict(
-            label='urlresolver settings',
+            label='  urlresolver settings',
             path=plugin.url_for('urlresolver_settings'))]
-    items.extend(map(
-        lambda provider: dict(
-            label=provider.name,
-            path=plugin.url_for('search', provider=provider.name),
-            thumbnail=provider.thumbnail),
-        providers))
+    if plugin.user_providers:
+        items.append(
+            dict(
+                label='  reload my providers file',
+                path=plugin.url_for('reload_user_providers')
+            ))
     return items
 
 
-@plugin.route('/search/<provider>')
-def search(provider):
-    p = get_plugin_provider(plugin, provider)
-    query = get_keyboard_query()
-    results = p.search(query)
-    return list_results(results, provider)
+@plugin.route('/search/<provider>', name='search_provider')
+@plugin.route('/search')
+def search(provider=None):
+    if provider:
+        p = get_plugin_provider(plugin, provider)
+        query = get_keyboard_query()
+        results = p.search(query)
+        return list_results(results, provider)
+    else:
+        return map(
+            lambda provider: dict(
+                label='search {0}'.format(provider.name),
+                path=plugin.url_for('search_provider', provider=provider.name),
+                thumbnail=provider.thumbnail),
+            get_plugin_providers(plugin))
 
 
 @plugin.route('/search-and-play')
@@ -141,6 +162,11 @@ def resolve(url):
     plugin.set_resolved_url(resolved)
 
 
+@plugin.route('/percuiro-settings')
+def percuiro_settings():
+    plugin.open_settings()
+
+
 @plugin.route('/provider-settings/<provider>/<setting>', name='provider_settings_set')
 @plugin.route('/provider-settings')
 def provider_settings(provider=None, setting=None):
@@ -184,6 +210,13 @@ def provider_settings(provider=None, setting=None):
     return items
 
 
+@plugin.route('/reload-user-providers')
+def reload_user_providers():
+    plugin.notify('Reloading user providers..')
+    init_user_providers()
+    plugin.notify('User providers reloaded..')
+
+
 @plugin.route('/_nowhere')
 def _nowhere():
     pass
@@ -207,16 +240,14 @@ def get_keyboard_query():
 
 
 def init_user_providers():
-    plugin.user_providers = tuple()
+    plugin.user_providers = []
     user_providers_fpath = plugin.get_setting('user_providers_fpath')
     if user_providers_fpath:
         try:
             my_providers = user_providers.get_user_providers(user_providers_fpath)
         except user_providers.PercuiroUserProvidersException as e:
-            plugin.log.error(e.message)
-            plugin.notify(msg=e.message, delay=5000)
+            plugin.notify(msg=e.message)
         else:
-            print my_providers
             plugin.user_providers = my_providers
 
 
