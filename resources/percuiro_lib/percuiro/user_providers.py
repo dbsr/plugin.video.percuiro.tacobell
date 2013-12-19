@@ -89,6 +89,6 @@ def validate_provider(provider):
                 continue
         if not v(val):
             raise PercuiroUserProvidersException(
-                '{0} provider validation invalid value error: {}, {}'.format(
+                '{0} provider validation invalid value error: {1}, {2}'.format(
                     provider.get('name', 'UNKNOWN_NAME'), k, val))
     return True

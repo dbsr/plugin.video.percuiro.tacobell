@@ -207,14 +207,16 @@ def get_keyboard_query():
 
 
 def init_user_providers():
-    plugin.user_providers = []
+    plugin.user_providers = tuple()
     user_providers_fpath = plugin.get_setting('user_providers_fpath')
     if user_providers_fpath:
         try:
             my_providers = user_providers.get_user_providers(user_providers_fpath)
         except user_providers.PercuiroUserProvidersException as e:
-            plugin.notify(msg=e.message)
+            plugin.log.error(e.message)
+            plugin.notify(msg=e.message, delay=5000)
         else:
+            print my_providers
             plugin.user_providers = my_providers
 
 
