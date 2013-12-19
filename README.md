@@ -81,8 +81,7 @@ Filestube, theextopia and downtr are the default search providers.
   in their pagination to designate the next page of the result set.
   The regex should be as exclusive as possible and only capture the
   part of the url containing the page number.
-  Example:
-    `
+  `Example:
         A provider uses this url for the 2nd page of results:
 
             http://provider.net/?q=blah&p=2
@@ -92,8 +91,8 @@ Filestube, theextopia and downtr are the default search providers.
             r'.*&p=([0-9]+)$'
 
         Note  don't forget the capture braces. Percuiro uses this to
-        increment from the current page to the next.
-    `
+        increment from the current page to the next.`
+
 - thumbnail_url (str):
 
   Optional, an external url to the logo of the provider. Percuiro will
