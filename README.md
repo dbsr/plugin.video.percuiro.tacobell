@@ -34,9 +34,11 @@ Filestube, theextopia and downtr are the default search providers.
 ### User Providers
 
 - name (str):
+
   The name of the provider
 
-- base_url (str):
+- base_url (str):a
+
   The url of the provider without any arguments / resources.
   This is used to resolve internal urls to their fully
   qualified urls. Eg. When a link has /foo as its url.
@@ -44,6 +46,7 @@ Filestube, theextopia and downtr are the default search providers.
   (http://ohhi.com/foo) before it makes the request.
 
 - query_url (str|lambda|tuple):
+
   The url used by percuiro to query the provider.
   When its a str Percuiro expects it to have a `{query}` placeholder.
   When its a lambda it should take the query as its argument and return
@@ -52,7 +55,8 @@ Filestube, theextopia and downtr are the default search providers.
   first item should be the full action post url, the second value should
   be the name of the the post data.
 
-- result_selector (list):
+- result_selector (list):a
+
   A list of tuples where each tuple is a selector step to get to
   the query result(s). If you're familiar with jQuery or BeautifulSoup
   this should be pretty self explanatory.
@@ -61,15 +65,18 @@ Filestube, theextopia and downtr are the default search providers.
   to the elements containing information about the results we are
   interested in.
 
-- get_result_label (lambda):
+- get_result_label (lambda):a
+
   This should be a lambda (function) which takes one argument, a soup
   object of one result element. It should return a str which percuiro
   uses as a title for the result in question.
 
 - get_link_label (lambda):
+
   Much like `get_result_label` but instead returns the link of the result.
 
-- next_page_format (regex_str):
+- next_page_format (regex_str):a
+
   Optional, this can be used for providers which do not use 'next'
   in their pagination to designate the next page of the result set.
   The regex should be as exclusive as possible and only capture the
@@ -84,6 +91,7 @@ Filestube, theextopia and downtr are the default search providers.
         increment from the current page to the next.
     `
 - thumbnail_url (str):
+
   Optional, an external url to the logo of the provider. Percuiro will
   only download this once and use it in the xbmc menu's.
 
