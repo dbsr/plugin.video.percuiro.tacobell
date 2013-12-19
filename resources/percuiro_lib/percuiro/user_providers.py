@@ -22,7 +22,7 @@ def get_user_providers(user_providers_fpath):
 def import_user_providers(user_providers_fpath):
     if not os.path.exists(user_providers_fpath):
         raise PercuiroUserProvidersException(
-            '{0:!r} does not exist on filesystem'.format(user_providers_fpath))
+            '{0!r} does not exist on filesystem'.format(user_providers_fpath))
 
     fname = os.path.basename(user_providers_fpath)
     fpath = os.path.dirname(user_providers_fpath)
@@ -30,7 +30,7 @@ def import_user_providers(user_providers_fpath):
     try:
         user_providers = __import__(fname.rstrip('.py'))
     except ImportError as e:
-        raise PercuiroUserProvidersException('Could not import `{0}`: {1:!r}'.format(
+        raise PercuiroUserProvidersException('Could not import `{0}`: {1!r}'.format(
             user_providers_fpath, e.message))
     finally:
         sys.path.remove(fpath)
