@@ -1,4 +1,4 @@
-### plugin.video.percuiro.tacobell
+
 # Percuiro Taco Bell
 
 
@@ -89,6 +89,13 @@ PROVIDER DICTIONARY KEYWORDS:
     thumbnail_url (str):
         Optional, an external url to the logo of the provider. Percuiro will
         only download this once and use it in the xbmc menu's.
+
+    test_data (dict):
+        Optional. This data is used to test the provider.
+        keys:
+            query (str): the query to search for
+            num_search_results (int): how many results should the provider return
+            first_link_url (str): the url of the first result
 
 
 MY_PROVIDERS FILE STRUCTURE:

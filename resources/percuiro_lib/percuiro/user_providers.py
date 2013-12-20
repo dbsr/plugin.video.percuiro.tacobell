@@ -53,7 +53,7 @@ def validate_user_providers_module(user_providers_module):
 
 def validate_provider(provider):
     is_function = lambda x: isinstance(x, FunctionType)
-    is_url = lambda x: isinstance(x, str) and x.startswith('http')
+    is_url = lambda x: isinstance(x, str) and re.match(r'/|http', x)
     validators = [
         (
             'name',
@@ -84,7 +84,7 @@ def validate_provider(provider):
         if not val:
             if k not in ['next_page_format', 'thumbnail_url']:
                 raise PercuiroUserProvidersException(
-                    '{0} provider validation key error: {1:!r} not in dictionary'.format(
+                    '{0} provider validation key error: {1!r} not in dictionary'.format(
                         provider.get('name', 'UNKNOWN_NAME'), k))
             else:
                 continue

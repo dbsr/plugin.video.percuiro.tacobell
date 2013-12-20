@@ -60,6 +60,13 @@ PROVIDER DICTIONARY KEYWORDS:
         Optional, an external url to the logo of the provider. Percuiro will
         only download this once and use it in the xbmc menu's.
 
+    test_data (dict):
+        Optional. This data is used to test the provider.
+        keys:
+            query (str): the query to search for
+            num_search_results (int): how many results should the provider return
+            first_link_url (str): the url of the first result
+
 
 MY_PROVIDERS FILE STRUCTURE:
 
@@ -88,7 +95,12 @@ providers = (
         result_selector=[('div', {'id': 'newresult'})],
         get_result_label=lambda result: result.find('a').text,
         get_result_url=lambda result: result.find('a').get('href'),
-        thumbnail_url='http://www.userlogos.org/files/logos/teekay/filestube.png'
+        thumbnail_url='http://www.userlogos.org/files/logos/teekay/filestube.png',
+        test_data=dict(
+            query='modern family s03e02',
+            num_search_results=10,
+            first_link_url='/c0r25p5wgATB2eaJktPx1o'
+        )
     ),
     dict(
         name='downtr.co',
@@ -97,7 +109,12 @@ providers = (
         result_selector=[('div', {'class': 'result'}), ('div', {'class': 'name'}), ('a',)],
         get_result_label=lambda result: result.text,
         get_result_url=lambda result: result.get('href'),
-        thumbnail_url='http://www.userlogos.org/files/imagecache/thumbnail/logos/Efreak15/12400474740-orig.png'
+        thumbnail_url='http://www.userlogos.org/files/imagecache/thumbnail/logos/Efreak15/12400474740-orig.png',
+        test_data=dict(
+            query='parks and recreation s06e08',
+            num_search_results=10,
+            first_link_url='http://www.downtr.co/2747314-parks-and-recreation-s06e08-720p-hdtv-x264-dimension.html'
+        )
     ),
     dict(
         name='theextopia.com',
@@ -106,16 +123,25 @@ providers = (
         result_selector=[('div', {'class': 'single'})],
         get_result_label=lambda result: result.find('div', {'class': 'title'}).text,
         get_result_url=lambda result: result.find('a', {'rel': 'bookmark'}).get('href'),
-        thumbnail_url='http://www.theextopia.com/wp-content/themes/mobipress-theme/images/blogname.png'
+        thumbnail_url='http://www.theextopia.com/wp-content/themes/mobipress-theme/images/blogname.png',
+        test_data=dict(
+            query='modern family s04e01',
+            num_search_results=6,
+            first_link_url='http://www.theextopia.com/modern-family-s04e01-hdtv-x264-2hd-modern-family-s04e01-720p-hdtv-x264-dimension/'
+        )
     ),
     dict(
-        name='rapidlibrary.biz',
-        base_url='http://rapidlibrary.biz',
-        query_url=lambda query: 'http://rapidlibrary.biz/{0}/{1}.html'.format(
-            query[0], query.replace('+', '-')),
-        result_selector=[('ol', {'class': 'results-list'}), ('li',)],
-        get_result_label=lambda soup: soup.find('a').text,
-        get_result_url=lambda soup: soup.find('a').get('href'),
-        thumbnail_url='http://rapidlibrary.biz/images/logo-small.png'
+        name='mega-search.me',
+        base_url='http://mega-search.me',
+        query_url='/search?k={query}',
+        result_selector=[('a', {'class': 'link'})],
+        get_result_label=lambda soup: soup.text,
+        get_result_url=lambda soup: soup.get('href'),
+        thumbnail_url='http://mega-search.me/public/images/logo.png',
+        test_data=dict(
+            query='modern family s05e03',
+            num_search_results=1,
+            first_link_url='http://mega-search.me/goto-136240'
+        )
     )
 )

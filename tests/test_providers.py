@@ -3,53 +3,46 @@
 
 import os
 import cPickle
-import tempfile
 
 from percuiro import get_providers
 
-
-fixtures = {
-    'downtr.co': dict(
-        num_search_results=2,
-        num_link_results=2),
-    'filestube.com': dict(
-        num_search_results=10,
-        num_link_results=1),
-    'theextopia.com': dict(
-        num_search_results=4,
-        num_link_results=14),
-    'rapidlibrary.biz': dict(
-        num_search_results=1,
-        num_link_results=1)
-}
-
-plugin_path = os.path.join(tempfile.gettempdir(), '_percuiro_test')
-
-providers = map(
-    lambda provider: (
-        provider,
-        fixtures[provider.name],
-        cPickle.load(open(os.path.join(os.path.dirname(os.path.realpath(
-            __file__)), 'test_data/pickles/' + provider.name + '.pickle')))
-    ),
-    get_providers().values())
+providers = []
 
 
-def test_search_results():
-    for provider, fixture, pickle in providers:
-        yield check_search_results, provider, fixture['num_search_results'], pickle['result_soup']
+def setup_module():
+    providers.extend(map(
+        lambda provider: (
+            _get_soup(provider), provider),
+        filter(
+            lambda provider: provider.test_data,
+            get_providers().values())))
 
 
-def test_link_results():
-    for provider, fixture, pickle in providers:
-        yield check_link_results, provider, fixture['num_link_results'], pickle['links_soup']
+def _get_soup(provider):
+    name = provider.name
+    pickle_path = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)),
+        'test_data/pickles/{0}.pickle'.format(name))
+    if not os.path.isfile(pickle_path):
+        query_url = provider._create_query_url(provider.test_data['query'])
+        search_result_soup = provider._req_soup(query_url)
+        with open(pickle_path, 'w') as f:
+            cPickle.dump(search_result_soup, f)
+    with open(pickle_path) as f:
+        return cPickle.load(f)
 
 
-def check_search_results(provider, num_search_results, soup):
+def test_providers():
+    for soup, provider in providers:
+        yield (
+            check_search_results,
+            provider,
+            soup,
+            provider.test_data['num_search_results'],
+            provider.test_data['first_link_url'])
+
+
+def check_search_results(provider, soup, num_search_results, first_link_url):
     results = provider._parse_results_page(soup, '')
     assert len(results) == num_search_results
-
-
-def check_link_results(provider, num_link_results, soup):
-    results = provider._parse_link_page(soup)
-    assert len(results) == num_link_results
+    assert results[0]['url'] == first_link_url

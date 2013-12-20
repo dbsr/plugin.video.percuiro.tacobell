@@ -5,12 +5,12 @@ import json
 
 from xbmcswift2 import Plugin, xbmc
 import urlresolver
-from urlresolver.types import HostedMediaFile
 
 from percuiro import (util, get_plugin_providers, get_plugin_provider,
                       user_providers)
 
 plugin = Plugin()
+plugin.user_providers = tuple()
 no_click = lambda: plugin.url_for('_nowhere')
 
 
@@ -81,11 +81,16 @@ def search_and_play():
     for provider in get_plugin_providers(plugin):
         plugin.notify(msg='Querying {0}...'.format(provider.name))
         results = provider.search(query)
+        links = []
         for result in filter(
                 lambda result: util.query_in_label(query, result['label']),
                 results):
             plugin.notify(msg='{0}: Resolving link..'.format(provider.name))
             links = provider.get_link_page(result['url'])
+            if result.get('is_playable'):
+                links.append(result)
+            if not links:
+                links = provider.get_link_page(result['url'])
             for link in links:
                 resolved = urlresolver.resolve(link['url'])
                 if resolved:
@@ -134,14 +139,8 @@ def resolve_provider_page(provider, url, label):
     if label == 'Next >>':
         results = p.parse_next_page(url)
         return list_results(results, provider)
-    results = p.get_link_page(url)
-    if len(results) == 1:
-        plugin.notify(msg='Link succesfully resolved..')
-        hosted = HostedMediaFile(url=results[0]['url'])
-        resolved = hosted.resolve()
-        if resolved:
-            xbmc.Player().play(resolved)
-        return
+    else:
+        results = p.get_link_page(url)
     return map(
         lambda result: dict(
             label=result['label'],
@@ -157,8 +156,9 @@ def urlresolver_settings():
 
 @plugin.route('/resolve/<url>')
 def resolve(url):
+    url = url.replace('#', '%23')
     resolved = urlresolver.resolve(url)
-    plugin.set_resolved_url(resolved)
+    return plugin.set_resolved_url(resolved)
 
 
 @plugin.route('/percuiro-settings')
@@ -234,11 +234,19 @@ def _nowhere():
 
 
 def list_results(results, provider, indentation=0):
-    return map(
-        lambda result: dict(
-            label=' '.join('' for x in xrange(indentation)) + result['label'],
-            path=plugin.url_for('resolve_provider_page', provider=provider, url=result['url'], label=result['label'])),
-        results)
+    items = []
+    for result in results:
+        item = {}
+        url = result.pop('url')
+        item['label'] = util.label_from_result(result)
+        if result.get('is_playable'):
+            item['path'] = plugin.url_for('resolve', url=url)
+            item['is_playable'] = True
+        else:
+            item['path'] = plugin.url_for(
+                'resolve_provider_page', provider=provider, url=url, label=result['label'])
+        items.append(item)
+    return items
 
 
 def get_keyboard_query():
@@ -251,7 +259,6 @@ def get_keyboard_query():
 
 
 def init_user_providers():
-    plugin.user_providers = tuple()
     user_providers_fpath = plugin.get_setting('user_providers_fpath')
     if user_providers_fpath:
         try:

@@ -13,7 +13,7 @@ import common
 
 class Provider(object):
     def __init__(self, name, base_url, query_url, result_selector,
-                 get_result_label, get_result_url, next_page_format=None, **kwargs):
+                 get_result_label, get_result_url, test_data=None, next_page_format=None, **kwargs):
         '''The Provider class is used by all provider definition to search
         and parse results.
         '''
@@ -23,6 +23,7 @@ class Provider(object):
         self.result_selector = result_selector
         self.get_result_label = get_result_label
         self.get_result_url = get_result_url
+        self.test_data = test_data
         self.next_page_format = next_page_format
 
     def __repr__(self):
@@ -43,7 +44,22 @@ class Provider(object):
             req = requests.post(url, data=post_data)
         else:
             req = requests.get(url)
+        if req.url != url and util.is_debrid_host(req.url):
+            return BeautifulSoup('<a href="{0}">{0}</a>'.format(req.url.replace('#', '%23')))
         return BeautifulSoup(req.content)
+
+    def _create_query_url(self, query):
+        if isinstance(self.query_url, tuple):
+            # assume we need to use post in our query request
+            url, post_key = self.query_url
+            return url, {post_key: query}
+        query = query.replace(' ', '+')
+        try:
+            url = self.query_url.format(query=query)
+        except AttributeError:
+            if isinstance(self.query_url, FunctionType):
+                url = self.query_url(query)
+        return url
 
     def _selector_chain(self, chain, soup):
         '''Sequentially iterates over soup / results using the selectors in
@@ -84,19 +100,12 @@ class Provider(object):
             a list of result dictionaries.
 
         '''
-        if isinstance(self.query_url, tuple):
-            # assume we need to use post in our query request
-            url, post_key = self.query_url
-            soup = self._req_soup(url, post_data={
-                post_key: query})
-            return soup
-        query = query.replace(' ', '+')
-        try:
-            url = self.query_url.format(query=query)
-        except AttributeError:
-            if isinstance(self.query_url, FunctionType):
-                url = self.query_url(url)
-        soup = self._req_soup(url)
+        url = self._create_query_url(query)
+        if isinstance(url, tuple):
+            url, post_data = url
+            soup = self._req_soup(url, post_data)
+        else:
+            soup = self._req_soup(url)
         return self._parse_results_page(soup, url)
 
     def _parse_results_page(self, soup, url):
@@ -118,6 +127,9 @@ class Provider(object):
                 result['ext'] = ext_match.group(0).strip('.')
             if util.is_valid_result(result):
                 results.append(result)
+            # if result url is hoster url, skip provider resolve step
+            if util.is_debrid_host(result['url']):
+                result['is_playable'] = True
         next_page = self._get_next_page_url(soup, url)
         if next_page:
             results.append(dict(
@@ -168,14 +180,26 @@ class Provider(object):
         return self._parse_link_page(soup)
 
     def _parse_link_page(self, soup):
-        return map(
-            lambda link: dict(
-                label=util.label_from_link(link),
-                url=link),
-            filter(
-                lambda url: util.is_debrid_host(url) and not re.search(
-                    r'\.rar', url),
-                set(re.findall(r'''http[\w.\-/:?=&_]+''', repr(soup)))))
+        results = filter(
+            lambda result: util.is_valid_result(result),
+            map(
+                lambda anchor: dict(
+                    label=anchor.text.encode('utf8'),
+                    url=anchor.get('href')),
+                filter(
+                    lambda anchor: anchor.get('href') and util.is_debrid_host(
+                        anchor.get('href')),
+                    soup.findAll('a'))))
+        if not results:
+            results = map(
+                lambda link: dict(
+                    label=util.label_from_link(link),
+                    url=link),
+                filter(
+                    lambda url: util.is_debrid_host(url) and not re.search(
+                        r'\.rar', url),
+                    set(re.findall(r'''http[\w.\-/:?=&_]+''', repr(soup)))))
+        return results
 
     def parse_next_page(self, url):
         soup = self._req_soup(url)
