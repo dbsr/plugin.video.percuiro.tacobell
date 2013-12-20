@@ -13,7 +13,9 @@ def setup_module():
     providers.extend(map(
         lambda provider: (
             _get_soup(provider), provider),
-        get_providers().values()))
+        filter(
+            lambda provider: provider.test_data,
+            get_providers().values())))
 
 
 def _get_soup(provider):
@@ -42,7 +44,5 @@ def test_providers():
 
 def check_search_results(provider, soup, num_search_results, first_link_url):
     results = provider._parse_results_page(soup, '')
-    print provider.name, len(results)
     assert len(results) == num_search_results
-    print results[0]['url']
     assert results[0]['url'] == first_link_url

@@ -13,7 +13,7 @@ import common
 
 class Provider(object):
     def __init__(self, name, base_url, query_url, result_selector,
-                 get_result_label, get_result_url, test_data, next_page_format=None, **kwargs):
+                 get_result_label, get_result_url, test_data=None, next_page_format=None, **kwargs):
         '''The Provider class is used by all provider definition to search
         and parse results.
         '''
