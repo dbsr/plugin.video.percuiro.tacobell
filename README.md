@@ -8,7 +8,12 @@
 
 Percurio Taco Bell is a video plugin for xbmc. You can use it to search for
 video files using a combination of search providers.
-Filestube, theextopia and downtr are the default search providers.
+Default search providers:
+
+- filestube.com
+- downtr.co
+- theextopia.com
+- mega-search.me
 
 
 ### Features
