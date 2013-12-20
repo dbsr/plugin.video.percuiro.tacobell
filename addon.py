@@ -84,15 +84,14 @@ def search_and_play():
         for result in filter(
                 lambda result: util.query_in_label(query, result['label']),
                 results):
-            plugin.notify(msg='{1}: Resolving link: {0}'.format(provider.name,
-                          result['url']))
+            plugin.notify(msg='{0}: Resolving link..'.format(provider.name))
             links = provider.get_link_page(result['url'])
             for link in links:
                 resolved = urlresolver.resolve(link['url'])
                 if resolved:
                     xbmc.Player().play(resolved)
                     return
-                plugin.notify(msg='Failed resolving: {0}'.format(link['url']))
+    plugin.notify('No playable links found for query: {0!r}'.format(query))
 
 
 @plugin.route('/global-search/<next_pages>', name='global_search_next')
