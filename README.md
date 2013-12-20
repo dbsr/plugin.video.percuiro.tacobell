@@ -2,6 +2,8 @@
 # Percuiro Taco Bell
 
 
+### Version 0.4
+
 ### Description
 
 Percurio Taco Bell is a video plugin for xbmc. You can use it to search for
