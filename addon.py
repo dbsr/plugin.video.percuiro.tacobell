@@ -238,7 +238,7 @@ def list_results(results, provider, indentation=0):
     for result in results:
         item = {}
         url = result.pop('url')
-        item['label'] = util.label_from_result(result)
+        item['label'] = ' ' * indentation + util.label_from_result(result)
         if result.get('is_playable'):
             item['path'] = plugin.url_for('resolve', url=url)
             item['is_playable'] = True
