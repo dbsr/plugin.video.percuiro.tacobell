@@ -3,7 +3,6 @@
 
 
 import os
-import commands
 import re
 import subprocess
 from urlparse import urlparse
@@ -47,12 +46,12 @@ def get_provider_thumbnail(plugin_profile_path, url):
     if not os.path.isdir(provider_thumbnails_path):
         os.mkdir(provider_thumbnails_path)
     destination = os.path.join(
-        provider_thumbnails_path, 
+        provider_thumbnails_path,
         '{0}.{1}'.format(str(hash(url)), ext).strip('-'))
     if not os.path.exists(destination):
-        try: 
+        try:
             urllib.urlretrieve(url, destination)
-        except IOError as e:
+        except IOError:
             print 'Error retrieving provider thumbnail: {0} -> {1}.'.format(
                 url, destination)
             return
@@ -69,3 +68,9 @@ def is_valid_result(result):
     if re.search(r'\.?(?:rar|zip)', str(result)):
         return False
     return True
+
+
+def label_from_result(result):
+    return ' - '.join(filter(
+        lambda x: x,
+        [result.get('host', '').upper(), result.get('ext', ''), result['label']]))
