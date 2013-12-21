@@ -2,7 +2,7 @@
 
 
 ### Version 0.4
-[DOWNLOAD plugin.video.percuiro.tacobell.zip](https://github.com/dbsr/plugin.video.percuiro.tacobell/raw/master/plugin.video.percuiro.tacobell.zip)
+download:[plugin.video.percuiro.tacobell.zip](https://github.com/dbsr/plugin.video.percuiro.tacobell/raw/master/plugin.video.percuiro.tacobell.zip)
 ### Description
 
 Percurio Taco Bell is a video plugin for xbmc. You can use it to search for
