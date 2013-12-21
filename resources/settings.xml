@@ -1,5 +1,8 @@
 <settings>
+    <category label="Search and Play">
+        <setting id="prefer_720p" type="bool" label="prefer 720p results" default="true" />
+    </category>
     <category label="My Providers">
         <setting id="user_providers_fpath" type="file" label="my_providers.py path" default="" />
-  </category>
+    </category>
 </settings>

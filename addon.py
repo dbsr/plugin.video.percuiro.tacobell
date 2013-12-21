@@ -38,7 +38,7 @@ def index():
             path=plugin.url_for('percuiro_settings')
         ),
         dict(
-            label='  providers settings',
+            label='  provider settings',
             path=plugin.url_for('provider_settings')
         ),
         dict(
@@ -71,13 +71,20 @@ def search(provider=None):
 
 
 @plugin.route('/search-and-play')
-def search_and_play():
+def search_and_play(query=None):
     '''
     Queries available providers in order of priority and plays first
     available result
 
     '''
-    query = get_keyboard_query()
+    orig_query = None
+    if not query:
+        query = get_keyboard_query()
+        orig_query = query
+        if (plugin.get_setting('prefer_720p') and '720p' not in query
+                and 'mkv' not in query):
+            plugin.notify('First searching for 720p results..')
+            query += ' 720p'
     for provider in get_plugin_providers(plugin):
         plugin.notify(msg='Querying {0}...'.format(provider.name))
         results = provider.search(query)
@@ -96,7 +103,11 @@ def search_and_play():
                 if resolved:
                     xbmc.Player().play(resolved)
                     return
-    plugin.notify('No playable links found for query: {0!r}'.format(query))
+                plugin.notify(msg='Failed resolving: {0}'.format(link['url']))
+    if orig_query and orig_query is not query:
+        plugin.notify('No 720p results found, reverting to original query..')
+        return search_and_play(query)
+    plugin.notify('Search & Play for query: {0!r} failed.'.format(query))
 
 
 @plugin.route('/global-search/<next_pages>', name='global_search_next')
