@@ -1,7 +1,7 @@
 # Percuiro Taco Bell
 
 
-### Version 0.4
+### Version 0.5
 download: 
 [plugin.video.percuiro.tacobell.zip](https://github.com/dbsr/plugin.video.percuiro.tacobell/raw/master/plugin.video.percuiro.tacobell.zip)
 ### Description
