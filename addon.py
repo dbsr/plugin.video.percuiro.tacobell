@@ -92,8 +92,8 @@ def search_and_play(query=None):
         for result in filter(
                 lambda result: util.query_in_label(query, result['label']),
                 results):
-            plugin.notify(msg='{1}: Resolving link: {0}'.format(provider.name,
-                          result['url']))
+            plugin.notify(msg='{0}: Resolving link..'.format(provider.name))
+            links = provider.get_link_page(result['url'])
             if result.get('is_playable'):
                 links.append(result)
             if not links:
@@ -249,7 +249,7 @@ def list_results(results, provider, indentation=0):
     for result in results:
         item = {}
         url = result.pop('url')
-        item['label'] = util.label_from_result(result)
+        item['label'] = ' ' * indentation + util.label_from_result(result)
         if result.get('is_playable'):
             item['path'] = plugin.url_for('resolve', url=url)
             item['is_playable'] = True

@@ -73,4 +73,4 @@ def is_valid_result(result):
 def label_from_result(result):
     return ' - '.join(filter(
         lambda x: x,
-        [result.get('host', '').upper(), result.get('ext', ''), result['label']]))
+        [result.get('host'), result.get('ext', ''), result['label']]))
