@@ -81,9 +81,10 @@ def search_and_play(query=None):
     if not query:
         query = get_keyboard_query()
         orig_query = query
-        if plugin.get_setting('prefer_720p'):
-            if '720p' not in query or 'mkv' not in query:
-                query += ' 720p'
+        if (plugin.get_setting('prefer_720p') and '720p' not in query
+                and 'mkv' not in query):
+            plugin.notify('First searching for 720p results..')
+            query += ' 720p'
     for provider in get_plugin_providers(plugin):
         plugin.notify(msg='Querying {0}...'.format(provider.name))
         results = provider.search(query)
@@ -104,7 +105,7 @@ def search_and_play(query=None):
                     return
                 plugin.notify(msg='Failed resolving: {0}'.format(link['url']))
     if orig_query and orig_query is not query:
-        plugin.notify('Search for 720p results failed...')
+        plugin.notify('No 720p results found, reverting to original query..')
         return search_and_play(query)
     plugin.notify('Search & Play for query: {0!r} failed.'.format(query))
 
