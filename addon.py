@@ -8,6 +8,7 @@ import urlresolver
 
 from percuiro import (util, get_plugin_providers, get_plugin_provider,
                       user_providers)
+import requests
 
 plugin = Plugin()
 plugin.user_providers = tuple()
@@ -168,7 +169,14 @@ def urlresolver_settings():
 @plugin.route('/resolve/<url>')
 def resolve(url):
     url = url.replace('#', '%23')
-    resolved = urlresolver.resolve(url)
+    req_cookies = requests.get('http://real-debrid.com/ajax/login.php?user=dbsr&pass=dnu7dirmamgrygh')
+    req = requests.get('http://real-debrid.com/ajax/unrestrict.php?link=' + url, cookies=req_cookies.cookies)
+    resp = req.json()
+    print resp
+    if resp['error']:
+        resolved = False
+    else:
+        resolved = resp['main_link']
     return plugin.set_resolved_url(resolved)
 
 

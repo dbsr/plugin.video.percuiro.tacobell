@@ -25,6 +25,7 @@ def _get_soup(provider):
         'test_data/pickles/{0}.pickle'.format(name))
     if not os.path.isfile(pickle_path):
         query_url = provider._create_query_url(provider.test_data['query'])
+        print query_url
         search_result_soup = provider._req_soup(query_url)
         with open(pickle_path, 'w') as f:
             cPickle.dump(search_result_soup, f)
@@ -43,6 +44,8 @@ def test_providers():
 
 
 def check_search_results(provider, soup, num_search_results, first_link_url):
+    print provider.name
     results = provider._parse_results_page(soup, '')
+    print len(results)
     assert len(results) == num_search_results
     assert results[0]['url'] == first_link_url
