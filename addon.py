@@ -168,8 +168,10 @@ def urlresolver_settings():
 
 @plugin.route('/resolve/<url>')
 def resolve(url):
+    print url
     url = url.replace('#', '%23')
     req_cookies = requests.get('http://real-debrid.com/ajax/login.php?user=dbsr&pass=dnu7dirmamgrygh')
+    print 'logged in'
     req = requests.get('http://real-debrid.com/ajax/unrestrict.php?link=' + url, cookies=req_cookies.cookies)
     resp = req.json()
     print resp
