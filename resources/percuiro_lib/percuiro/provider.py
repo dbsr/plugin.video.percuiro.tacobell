@@ -44,6 +44,7 @@ class Provider(object):
             req = requests.post(url, data=post_data)
         else:
             req = requests.get(url)
+        print req.url
         if req.url != url and util.is_debrid_host(req.url):
             return BeautifulSoup('<a href="{0}">{0}</a>'.format(req.url.replace('#', '%23')))
         return BeautifulSoup(req.content)
@@ -180,25 +181,22 @@ class Provider(object):
         return self._parse_link_page(soup)
 
     def _parse_link_page(self, soup):
-        results = filter(
-            lambda result: util.is_valid_result(result),
-            map(
-                lambda anchor: dict(
-                    label=anchor.text.encode('utf8'),
-                    url=anchor.get('href')),
-                filter(
-                    lambda anchor: anchor.get('href') and util.is_debrid_host(
-                        anchor.get('href')),
-                    soup.findAll('a'))))
+        results = []
+        for anchor in soup.findAll('a'):
+            href = anchor.get('href', '')
+            if  href.startswith('http') and util.is_debrid_host(href):
+                if href not in [r['url'] for r in results]:
+                    results.append(dict(
+                        url=href,
+                        label=anchor.text or href))
         if not results:
-            results = map(
-                lambda link: dict(
-                    label=util.label_from_link(link),
-                    url=link),
-                filter(
-                    lambda url: util.is_debrid_host(url) and not re.search(
-                        r'\.rar', url),
-                    set(re.findall(r'''http[\w.\-/:?=&_]+''', repr(soup)))))
+            for href in set(re.findall(r'''http[\w.\-/:?=&_]+''', repr(soup))):
+                if util.is_debrid_host(href):
+                    if href not in [r['url'] for r in results]:
+                        results.append(dict(
+                            url=href,
+                            label=href
+                        ))
         return results
 
     def parse_next_page(self, url):

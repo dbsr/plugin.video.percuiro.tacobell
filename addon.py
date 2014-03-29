@@ -3,15 +3,13 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'resources/percuiro_lib'))
 import json
 
-from xbmcswift2 import Plugin, xbmc
+from xbmcswift2 import xbmc
 import urlresolver
 
-from percuiro import (util, get_plugin_providers, get_plugin_provider,
-                      user_providers)
+from percuiro import (util, get_plugin_providers, get_plugin_provider, realdebrid, plugin)
 import requests
 
-plugin = Plugin()
-plugin.user_providers = tuple()
+
 no_click = lambda: plugin.url_for('_nowhere')
 
 
@@ -45,12 +43,6 @@ def index():
         dict(
             label='  urlresolver settings',
             path=plugin.url_for('urlresolver_settings'))]
-    if plugin.user_providers:
-        items.append(
-            dict(
-                label='  reload my providers file',
-                path=plugin.url_for('reload_user_providers')
-            ))
     return items
 
 
@@ -100,7 +92,8 @@ def search_and_play(query=None):
             if not links:
                 links = provider.get_link_page(result['url'])
             for link in links:
-                resolved = urlresolver.resolve(link['url'])
+                print link['url']
+                resolved = resolver(link['url'])
                 if resolved:
                     xbmc.Player().play(resolved)
                     return
@@ -168,17 +161,7 @@ def urlresolver_settings():
 
 @plugin.route('/resolve/<url>')
 def resolve(url):
-    print url
-    url = url.replace('#', '%23')
-    req_cookies = requests.get('http://real-debrid.com/ajax/login.php?user=dbsr&pass=dnu7dirmamgrygh')
-    print 'logged in'
-    req = requests.get('http://real-debrid.com/ajax/unrestrict.php?link=' + url, cookies=req_cookies.cookies)
-    resp = req.json()
-    print resp
-    if resp['error']:
-        resolved = False
-    else:
-        resolved = resp['main_link']
+    resolved = resolver(url)
     return plugin.set_resolved_url(resolved)
 
 
@@ -242,12 +225,6 @@ def provider_settings(provider=None, setting=None):
     return items
 
 
-@plugin.route('/reload-user-providers')
-def reload_user_providers():
-    plugin.notify('Reloading user providers..')
-    init_user_providers()
-    plugin.notify('User providers reloaded..')
-
 
 @plugin.route('/_nowhere')
 def _nowhere():
@@ -270,6 +247,11 @@ def list_results(results, provider, indentation=0):
     return items
 
 
+def resolver(url):
+    print url
+    resolved = realdebrid.unrestrict_url(url)
+    return resolved
+
 def get_keyboard_query():
     last_search_storage = plugin.get_storage('last_search')
     last_search = last_search_storage.get('last_search', '')
@@ -279,17 +261,5 @@ def get_keyboard_query():
     return query
 
 
-def init_user_providers():
-    user_providers_fpath = plugin.get_setting('user_providers_fpath')
-    if user_providers_fpath:
-        try:
-            my_providers = user_providers.get_user_providers(user_providers_fpath)
-        except user_providers.PercuiroUserProvidersException as e:
-            plugin.notify(msg=e.message)
-        else:
-            plugin.user_providers = my_providers
-
-
 if __name__ == '__main__':
-    init_user_providers()
     plugin.run()

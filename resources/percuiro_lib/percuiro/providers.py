@@ -89,8 +89,8 @@ providers = (
     dict(
         name='filestube.com',
         base_url='http://www.filestube.com',
-        query_url=('http://www.filestube.com/query.html?hosting=23,99,15,24,13,'
-                   '27,8,28,2,11,46,51,55,59,60,64,65,67,68,70,71,81,'
+        query_url=('http://www.filestube.com/query.html?hosting=,23,99,15,24,13,'
+                   '22,27,25,8,28,2,40,11,46,47,51,55,59,60,64,65,67,70,71,81,'
                    '87,92,97,102,104&q={query}'),
         result_selector=[('div', {'class': 'newresult'})],
         get_result_label=lambda result: result.find('a', {'class': 'resultsLink'}).text,
@@ -131,13 +131,27 @@ providers = (
         )
     ),
     dict(
-        name='mega-search.me',
-        base_url='http://mega-search.me',
-        query_url='/search?k={query}',
-        result_selector=[('a', {'class': 'link'})],
+        name='filetram.com',
+        base_url='http://filetram.com',
+        query_url=lambda query: 'http://filetram.com/{0}'.format(query.replace(' ', '-')),
+        result_selector=[('a', {'class': 'highlight-item'})],
         get_result_label=lambda soup: soup.text,
         get_result_url=lambda soup: soup.get('href'),
-        thumbnail_url='http://mega-search.me/public/images/logo.png',
+        thumbnail_url='http://d1.filetram.com/cb3661976221/images/logos.png',
+        test_data=dict(
+            query='modern family s05e03',
+            num_search_results=1,
+            first_link_url='http://mega-search.me/goto-136240'
+        )
+    ),
+    dict(
+        name='sharedir.com',
+        base_url='http://sharedir.com',
+        query_url='http://sharedir.com/index.php?s={query}&ftype=4&stype=0,3,4,8,9,10,11,12,13,15,20,22,23,28,29,32,33,34,35,38,40,48,53,54,56,59,64,66,68,71,75,78,80,82,86,87,88,89,91,92,93&sort=dd',
+        result_selector=[('a', {'class': 'big'})],
+        get_result_label=lambda soup: soup.text,
+        get_result_url=lambda soup: soup.get('href'),
+        thumbnail_url='http://uploadcity.com/images/uc.gif',
         test_data=dict(
             query='modern family s05e03',
             num_search_results=1,
