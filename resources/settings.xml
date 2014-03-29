@@ -2,7 +2,8 @@
     <category label="Search and Play">
         <setting id="prefer_720p" type="bool" label="prefer 720p results" default="true" />
     </category>
-    <category label="My Providers">
-        <setting id="user_providers_fpath" type="file" label="my_providers.py path" default="" />
+    <category label="Resolver">
+        <setting id="real_debrid_username" type="string" label="Real Debrid Username" default="" />
+        <setting id="real_debrid_password" type="password" label="Real Debrid Password" default="" />
     </category>
 </settings>

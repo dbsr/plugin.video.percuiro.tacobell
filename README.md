@@ -1,9 +1,16 @@
 # Percuiro Taco Bell
 
 
-### Version 0.5
-Install addon using my repo. Download the repo.zip here: 
-[repository.dbsr.xbmc_addons.zip](https://github.com/dbsr/repository.dbsr.xbmc_addons/raw/master/repository.dbsr.xbmc_addons.zip)
+### Version
+
+* 0.6
+    -Fixed filestube resolve logic
+    -Added various providers
+    -Ditched urlresolver requirement.For now only works with Real Debrid
+
+* 0.5
+    Install addon using my repo. Download the repo.zip here: 
+    [repository.dbsr.xbmc_addons.zip](https://github.com/dbsr/repository.dbsr.xbmc_addons/raw/master/repository.dbsr.xbmc_addons.zip)
 ### Description
 
 Percurio Taco Bell is a video plugin for xbmc. You can use it to search for
