@@ -13,9 +13,9 @@ def get_cookies(force=False):
         username = plugin.get_setting('real_debrid_username')
         password = plugin.get_setting('real_debrid_password')
         req = requests.get('http://real-debrid.com/ajax/login.php', 
-            params=dict(
-                user=username,
-                'pass'=password))
+            params={
+                'user':username,
+                'pass':password})
         cookies = req.cookies
         realdebrid_storage['cookies'] = cookies
     return cookies
