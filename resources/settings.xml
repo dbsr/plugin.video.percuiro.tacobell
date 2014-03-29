@@ -3,7 +3,7 @@
         <setting id="prefer_720p" type="bool" label="prefer 720p results" default="true" />
     </category>
     <category label="Resolver">
-        <setting id="real_debrid_username" type="string" label="Real Debrid Username" default="" />
-        <setting id="real_debrid_password" type="password" label="Real Debrid Password" default="" />
+        <setting id="real_debrid_username" type="text" label="Real Debrid Username" default="" />
+        <setting id="real_debrid_password" type="text" option="hidden" label="Real Debrid Password" default="" />
     </category>
 </settings>
