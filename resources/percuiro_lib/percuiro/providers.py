@@ -92,9 +92,9 @@ providers = (
         query_url=('http://www.filestube.com/query.html?hosting=,23,99,15,24,13,'
                    '22,27,25,8,28,2,40,11,46,47,51,55,59,60,64,65,67,70,71,81,'
                    '87,92,97,102,104&q={query}'),
-        result_selector=[('div', {'class': 'newresult'})],
-        get_result_label=lambda result: result.find('a', {'class': 'resultsLink'}).text,
-        get_result_url=lambda result: result.find('a', {'class': 'resultsLink'}).get('href'),
+        result_selector=[('a', {'class': 'resultsLink'})],
+        get_result_label=lambda result: result.text,
+        get_result_url=lambda result: result.get('href'),
         thumbnail_url='http://www.userlogos.org/files/logos/teekay/filestube.png',
         test_data=dict(
             query='veep s01e01',
